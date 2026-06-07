@@ -1,0 +1,31 @@
+const mongoose = require("mongoose");
+
+const userLessonSchema = new mongoose.Schema(
+  {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    lesson: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Lesson",
+    },
+    completed: {
+      type: Boolean,
+      default: false,
+    },
+    progress: {
+      type: String,
+      default: "0%",
+    },
+    lastPosition: {
+      type: Number,
+      default: 0,
+    },
+  },
+  { timestamps: true },
+);
+
+const UserLesson = mongoose.model("UserLesson", userLessonSchema);
+
+module.exports = UserLesson;
