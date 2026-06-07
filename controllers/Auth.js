@@ -13,9 +13,8 @@ const sentTokenCookies = (res, token) => {
   res.cookie("jwt", token, {
     expires: new Date(Date.now() + 24 * 60 * 60 * 1000), //ms
     httpOnly: true,
-    secure: false,
-    sameSite: "lax",
-    // secure: true, only production
+    secure: process.env.ENV === "development" ? false : true,
+    sameSite: process.env.ENV === "development" ? "lax" : "none",
   });
 };
 
