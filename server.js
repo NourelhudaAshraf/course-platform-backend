@@ -25,7 +25,7 @@ app.use(
   }),
 );
 //middleware to parse the body of the request
-app.use(express.json({ limit: "10kb" })); // limit the size of the request body to 10kb
+app.use(express.json({ limit: "100mb" })); // limit the size of the request body to 100mb
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", userRouter);
