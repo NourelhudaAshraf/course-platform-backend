@@ -5,7 +5,6 @@ const router = express.Router();
 const { protect, restrictTo } = require("../controllers/Auth");
 const {
   getCheckoutSession,
-  webhookHandler,
   createEnrollment,
   checkIfCourseEnrolled,
   getEnrolledCourses,
@@ -13,11 +12,6 @@ const {
 } = require("../controllers/Enrollments");
 
 router.get("/success", createEnrollment);
-router.post(
-  "/webhook",
-  express.raw({ type: "application/json" }),
-  webhookHandler,
-);
 
 router.use(protect);
 router

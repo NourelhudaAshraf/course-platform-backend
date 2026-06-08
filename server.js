@@ -7,6 +7,7 @@ const userRouter = require("./routes/Users");
 const lessonRouter = require("./routes/Lessons");
 const enrollmentRouter = require("./routes/Enrollment");
 const statisticsRouter = require("./routes/Statistics");
+const { webhookHandler } = require("./controllers/Enrollments");
 const cors = require("cors");
 const connectDB = require("./utils/connectDB");
 
@@ -24,6 +25,7 @@ app.use(
     credentials: true,
   }),
 );
+app.post("/webhook", express.raw({ type: "application/json" }), webhookHandler);
 //middleware to parse the body of the request
 app.use(express.json({ limit: "100mb" })); // limit the size of the request body to 100mb
 
