@@ -62,7 +62,7 @@ const webhookHandler = async (req, res) => {
     await Enrollment.create({
       course: session.metadata.courseId,
       user: session.metadata.userId,
-      price: session.amount_total,
+      price: session.amount_total / 100,
       stripeSessionId: session.id,
     });
   }
