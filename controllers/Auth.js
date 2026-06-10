@@ -1,6 +1,7 @@
 const User = require("../models/Users");
 const catchAsync = require("../utils/catchAsync");
 const jwt = require("jsonwebtoken");
+const { validationResult } = require("express-validator");
 // const crypto = require('crypto');
 
 const signToken = (id) => {
@@ -20,6 +21,10 @@ const sentTokenCookies = (res, token) => {
 
 const signup = catchAsync(async (req, res, next) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return next({ status: 400, message: errors.array()[0].msg });
+    }
     const { name, email, password, role } = req.body;
     if (!name || !email || !password) {
       return next({ status: 400, message: "Invalid data" });

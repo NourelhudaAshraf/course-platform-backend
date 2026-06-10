@@ -12,11 +12,13 @@ const {
   watchLesson,
   getCompletedLessons,
 } = require("../controllers/UserLessons");
+const { watchLessonSchema } = require("../validations/UserLessons");
+const validate = require("../utils/validateSchema");
 
 const router = express.Router();
 
 router.patch("/update-me", protect, updateMe);
-router.post("/watch-lesson", protect, watchLesson);
+router.post("/watch-lesson", protect, validate(watchLessonSchema), watchLesson);
 router.get("/courses/:courseId/user-lessons", protect, getCompletedLessons);
 router.use(protect, restrictTo("admin"));
 router.route("/").get(getAllUsers);
