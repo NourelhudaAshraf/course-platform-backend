@@ -1,4 +1,5 @@
 const express = require("express");
+const multer = require("multer");
 const {
   getAllCourses,
   createCourse,
@@ -6,9 +7,15 @@ const {
   updateCourseById,
   deleteCourse,
   setUserId,
+  uploadImage,
 } = require("../controllers/Courses");
 const { protect, restrictTo } = require("../controllers/Auth");
 const lessonRouter = require("./Lessons");
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+});
+
 const {
   createCourseSchema,
   updateCourseSchema,
@@ -22,8 +29,10 @@ router
   .post(
     protect,
     restrictTo("admin"),
+    upload.single("image"),
     validate(createCourseSchema),
     setUserId,
+    uploadImage,
     createCourse,
   );
 
@@ -33,7 +42,9 @@ router
   .patch(
     protect,
     restrictTo("admin"),
+    upload.single("image"),
     validate(updateCourseSchema),
+    uploadImage,
     updateCourseById,
   )
   .delete(protect, restrictTo("admin"), deleteCourse);

@@ -15,10 +15,6 @@ const createCourseSchema = joi.object({
     "number.min": "Price must be greater than 0",
     "any.required": "Price is required",
   }),
-  image: joi.string().uri().required().messages({
-    "string.uri": "Image must be a valid URL",
-    "any.required": "Image is required",
-  }),
 });
 
 const updateCourseSchema = joi.object({
@@ -32,9 +28,6 @@ const updateCourseSchema = joi.object({
   }),
   price: joi.number().min(0).messages({
     "number.min": "Price must be greater than 0",
-  }),
-  image: joi.string().uri().messages({
-    "string.uri": "Image must be a valid URL",
   }),
 });
 
