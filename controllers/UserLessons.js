@@ -5,23 +5,32 @@ const catchAsync = require("../utils/catchAsync");
 
 const watchLesson = catchAsync(async (req, res, next) => {
   const { lessonId, lastPosition } = req.body;
-  const user = await User.findById(req.user._id);
   const lesson = await Lesson.findById(lessonId);
   if (!lesson) {
-    return next(new AppError("Lesson not found", 404));
+    return next({ status: 404, message: "Lesson not found" });
   }
   const userLesson = await UserLesson.findOne({
-    user: user._id,
+    user: req.user._id,
     lesson: lessonId,
   });
+
+  let progress = "0%";
+  let completed = false;
+  if (!lesson.totalSeconds || lesson.totalSeconds === 0) {
+    progress = "0%";
+    completed = false;
+  } else {
+    progress = `${(lastPosition / lesson.totalSeconds) * 100}%`;
+    completed = lastPosition >= lesson.totalSeconds;
+  }
   if (!userLesson) {
     //add to database
     const newUserLesson = await UserLesson.create({
-      user: user._id,
+      user: req.user._id,
       lesson: lessonId,
       lastPosition: lastPosition,
-      progress: `${(lastPosition / lesson.totalSeconds) * 100}%`,
-      completed: lastPosition >= lesson.totalSeconds,
+      progress,
+      completed,
     });
     return res.status(201).json({
       status: "success",
@@ -31,8 +40,15 @@ const watchLesson = catchAsync(async (req, res, next) => {
     //update in database
     const newLastPosition = Math.max(userLesson.lastPosition, lastPosition);
     userLesson.lastPosition = newLastPosition;
-    userLesson.progress = `${(newLastPosition / lesson.totalSeconds) * 100}%`;
-    userLesson.completed = newLastPosition >= lesson.totalSeconds;
+    if (!lesson.totalSeconds || lesson.totalSeconds === 0) {
+      progress = "0%";
+      completed = false;
+    } else {
+      progress = `${(newLastPosition / lesson.totalSeconds) * 100}%`;
+      completed = newLastPosition >= lesson.totalSeconds;
+    }
+    userLesson.progress = progress;
+    userLesson.completed = completed;
     await userLesson.save();
     return res.status(200).json({
       status: "success",
@@ -43,13 +59,12 @@ const watchLesson = catchAsync(async (req, res, next) => {
 
 const getLessonProgress = catchAsync(async (req, res, next) => {
   const { lessonId } = req.params;
-  const user = await User.findById(req.user._id);
   const lesson = await Lesson.findById(lessonId);
   if (!lesson) {
-    return next(new AppError("Lesson not found", 404));
+    return next({ status: 404, message: "Lesson not found" });
   }
   const userLesson = await UserLesson.findOne({
-    user: user._id,
+    user: req.user._id,
     lesson: lessonId,
   });
   return res.status(200).json({

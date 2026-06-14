@@ -11,7 +11,7 @@ const createCourseSchema = joi.object({
     "string.max": "Description must be less than 1000 characters long",
     "any.required": "Description is required",
   }),
-  price: joi.number().min(0).required().messages({
+  price: joi.number().min(0.01).required().messages({
     "number.min": "Price must be greater than 0",
     "any.required": "Price is required",
   }),
@@ -26,7 +26,7 @@ const updateCourseSchema = joi.object({
     "string.min": "Description must be at least 10 characters long",
     "string.max": "Description must be less than 1000 characters long",
   }),
-  price: joi.number().min(0).messages({
+  price: joi.number().min(0.01).messages({
     "number.min": "Price must be greater than 0",
   }),
 });

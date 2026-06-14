@@ -15,9 +15,6 @@ const signupSchema = joi.object({
     "string.max": "Password must be less than 30 characters long",
     "any.required": "Password is required",
   }),
-  role: joi.string().valid("user", "admin").default("user").messages({
-    "any.only": "Invalid role must be user or admin",
-  }),
 });
 
 const loginSchema = joi.object({
@@ -32,7 +29,18 @@ const loginSchema = joi.object({
   }),
 });
 
+const updateUserSchema = joi.object({
+  name: joi.string().min(3).max(30).optional().messages({
+    "string.min": "Name must be at least 3 characters long",
+    "string.max": "Name must be less than 30 characters long",
+  }),
+  email: joi.string().email().optional().messages({
+    "string.email": "Invalid email",
+  }),
+});
+
 module.exports = {
   signupSchema,
   loginSchema,
+  updateUserSchema,
 };

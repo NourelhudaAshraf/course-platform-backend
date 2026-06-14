@@ -4,7 +4,6 @@ const { getAllDocs, getOne, updateOne, deleteOne } = require("./handleFactory");
 
 const getAllUsers = getAllDocs(User);
 const getUserById = getOne(User);
-const updateUserById = updateOne(User);
 const deleteUser = deleteOne(User);
 
 const filteredBody = (body, ...allowedFields) => {
@@ -19,7 +18,10 @@ const filteredBody = (body, ...allowedFields) => {
 
 const updateMe = catchAsync(async (req, res, next) => {
   if (req.body.password) {
-    return next(new AppError("This route is not for password updates", 400));
+    return next({
+      status: 400,
+      message: "This route is not for password updates",
+    });
   }
   const filtered = filteredBody(req.body, "name", "email");
   const updatedUser = await User.findByIdAndUpdate(req.user._id, filtered, {
@@ -44,6 +46,9 @@ const getLatestUsers = catchAsync(async (req, res, next) => {
 
 const promoteUserToAdmin = catchAsync(async (req, res, next) => {
   const user = await User.findByIdAndUpdate(req.params.id, { role: "admin" });
+  if (!user) {
+    return next({ status: 404, message: "User not found" });
+  }
   res.status(200).json({
     status: "success",
     data: user,
@@ -53,7 +58,6 @@ const promoteUserToAdmin = catchAsync(async (req, res, next) => {
 module.exports = {
   getAllUsers,
   getUserById,
-  updateUserById,
   deleteUser,
   updateMe,
   getLatestUsers,

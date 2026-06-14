@@ -1,5 +1,5 @@
 const express = require("express");
-const { protect, restrictTo } = require("../controllers/Auth");
+const { protect, restrictTo } = require("../middleware/Auth");
 const {
   getAllUsers,
   getUserById,
@@ -13,12 +13,20 @@ const {
   getCompletedLessons,
 } = require("../controllers/UserLessons");
 const { watchLessonSchema } = require("../validations/UserLessons");
+const { updateUserSchema } = require("../validations/Auth");
 const validate = require("../utils/validateSchema");
+const { requireEnrollment } = require("../middleware/enrollment");
 
 const router = express.Router();
 
-router.patch("/update-me", protect, updateMe);
-router.post("/watch-lesson", protect, validate(watchLessonSchema), watchLesson);
+router.patch("/update-me", protect, validate(updateUserSchema), updateMe);
+router.post(
+  "/watch-lesson",
+  protect,
+  validate(watchLessonSchema),
+  requireEnrollment,
+  watchLesson,
+);
 router.get("/courses/:courseId/user-lessons", protect, getCompletedLessons);
 router.use(protect, restrictTo("admin"));
 router.route("/").get(getAllUsers);

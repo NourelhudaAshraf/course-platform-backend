@@ -25,7 +25,7 @@ const userLessonSchema = new mongoose.Schema(
   },
   { timestamps: true },
 );
-
+userLessonSchema.index({ user: 1, lesson: 1 }, { unique: true });
 const UserLesson = mongoose.model("UserLesson", userLessonSchema);
 
 module.exports = UserLesson;

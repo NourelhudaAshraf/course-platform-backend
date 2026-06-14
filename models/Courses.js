@@ -10,7 +10,11 @@ const courseSchema = new mongoose.Schema({
     required: [true, "A course should have a description!"],
     minlength: 8,
   },
-  price: Number,
+  price: {
+    type: Number,
+    required: [true, "A course should have a price!"],
+    min: [0.01, "Price must be greater than 0"],
+  },
   image: String,
   user: {
     type: mongoose.Schema.Types.ObjectId,
@@ -21,13 +25,6 @@ const courseSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-});
-
-courseSchema.pre(/^find/, function () {
-  this.populate({
-    path: "user",
-    select: "name",
-  });
 });
 
 const Course = mongoose.model("Course", courseSchema);

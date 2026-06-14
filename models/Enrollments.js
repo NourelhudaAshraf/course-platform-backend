@@ -19,22 +19,15 @@ const enrollmentSchema = new mongoose.Schema({
   price: {
     type: Number,
     required: [true, "Enrollment must have a price!"],
+    min: [0.01, "Price must be greater than 0"],
   },
+  stripeSessionId: { type: String, unique: true },
   createdAt: {
     type: Date,
     default: Date.now,
   },
 });
-
-enrollmentSchema.pre(/^find/, function () {
-  this.populate({
-    path: "user",
-    select: "name",
-  }).populate({
-    path: "course",
-    select: "title price description image",
-  });
-});
+enrollmentSchema.index({ user: 1, course: 1 }, { unique: true });
 
 const Enrollment = mongoose.model("Enrollment", enrollmentSchema);
 

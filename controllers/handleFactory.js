@@ -7,10 +7,7 @@ const deleteOne = (Model) =>
     if (!deletedDoc) {
       return next({ status: 404, message: "Item not found!" });
     }
-    res.status(204).json({
-      status: "success",
-      data: null,
-    });
+    res.status(204).send();
   });
 
 const createOne = (Model) =>
@@ -53,7 +50,7 @@ const getOne = (Model, popOptions) =>
     });
   });
 
-const getAllDocs = (Model, getUser) =>
+const getAllDocs = (Model, getUser, popOptions) =>
   catchAsync(async (req, res, next) => {
     // courses/:id/lessons
     const queryObj = { ...req.query };
@@ -76,10 +73,16 @@ const getAllDocs = (Model, getUser) =>
     // console.log(mongoFilter);
     // Title search (case-insensitive -> $options: "i" )
     if (queryObj.title) {
-      mongoFilter.title = { $regex: queryObj.title, $options: "i" };
+      const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      mongoFilter.title = {
+        $regex: escapeRegex(queryObj.title),
+        $options: "i",
+      };
     }
-    console.log(mongoFilter);
+    // console.log(mongoFilter);
     let query = Model.find(mongoFilter);
+
+    if (popOptions) query.populate(popOptions);
 
     //sort lessons by order
     if (req.params.courseId) {
@@ -95,7 +98,7 @@ const getAllDocs = (Model, getUser) =>
 
     // pagination
     const page = req.query.page * 1 || 1;
-    const limit = req.query.limit * 1 || 10;
+    const limit = Math.min(req.query.limit * 1 || 10, 25);
     const skip = (page - 1) * limit;
     query = query.skip(skip).limit(limit);
 

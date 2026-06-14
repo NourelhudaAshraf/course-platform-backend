@@ -27,13 +27,6 @@ const lessonSchema = new mongoose.Schema({
 });
 lessonSchema.index({ course: 1, order: 1 }, { unique: true });
 
-lessonSchema.pre(/^find/, function () {
-  this.populate({
-    path: "course",
-    select: "title",
-  });
-});
-
 const Lesson = mongoose.model("Lesson", lessonSchema);
 
 module.exports = Lesson;

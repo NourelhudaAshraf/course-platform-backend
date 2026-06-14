@@ -8,7 +8,16 @@ const { getAllDocs } = require("./handleFactory");
 const getCheckoutSession = catchAsync(async (req, res, next) => {
   const id = req.params.courseId;
   const course = await Course.findById(id);
-
+  if (!course) {
+    return next({ status: 404, message: "Course not found" });
+  }
+  const enroll = await Enrollment.findOne({ course: id, user: req.user._id });
+  if (enroll) {
+    return next({
+      status: 400,
+      message: "You are already enrolled in this course",
+    });
+  }
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ["card"],
     mode: "payment",
@@ -39,7 +48,9 @@ const getCheckoutSession = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: "success",
-    session,
+    session: {
+      url: session.url,
+    },
   });
 });
 
@@ -54,45 +65,73 @@ const webhookHandler = async (req, res) => {
       process.env.STRIPE_WEBHOOK_SECRET,
     );
   } catch (err) {
-    return res.status(400).send(`Webhook Error: ${err.message}`);
-  }
-  if (event.type === "checkout.session.completed") {
-    const session = event.data.object;
-    console.log("Payment successful!");
-    await Enrollment.create({
-      course: session.metadata.courseId,
-      user: session.metadata.userId,
-      price: session.amount_total / 100,
-      stripeSessionId: session.id,
+    return res.status(400).json({
+      status: "error",
+      message: `Webhook Error: ${err.message}`,
     });
   }
-
-  res.status(200).json({ received: true });
+  try {
+    if (event.type === "checkout.session.completed") {
+      const session = event.data.object;
+      const course = await Course.findById(session.metadata.courseId);
+      if (!course) {
+        return res
+          .status(404)
+          .json({ status: "error", message: "Course not found" });
+      }
+      if (course.price * 100 !== session.amount_total) {
+        return res
+          .status(400)
+          .json({ status: "error", message: "Price mismatch" });
+      }
+      // console.log("Payment successful!");
+      await Enrollment.findOneAndUpdate(
+        { stripeSessionId: session.id },
+        {
+          course: session.metadata.courseId,
+          user: session.metadata.userId,
+          price: course.price,
+          paymentStatus: "paid",
+        },
+        { upsert: true, new: true },
+      );
+    }
+    res.status(200).json({ status: "success", received: true });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ status: "error", message: "Enrollment processing failed" });
+  }
 };
 
-const createEnrollment = catchAsync(async (req, res, next) => {
-  const { userId: user, courseId: course, price } = req.query;
-  if (!user && !course && !price) return next();
-  await Enrollment.create({ user, course, price });
-  res.redirect(
-    `${req.protocol}://${process.env.FRONTEND_HOST}/courses/${course}`,
-  );
-});
+// const createEnrollment = catchAsync(async (req, res, next) => {
+//   const { userId: user, courseId: course, price } = req.query;
+//   if (!user && !course && !price) return next();
+//   await Enrollment.create({ user, course, price });
+//   res.redirect(
+//     `${req.protocol}://${process.env.FRONTEND_HOST}/courses/${course}`,
+//   );
+// });
 
 const checkIfCourseEnrolled = catchAsync(async (req, res, next) => {
   const { courseId: course } = req.params;
-  const enroll = await Enrollment.find({ user: req.user._id, course });
-  res.status(200).json({ data: !!enroll.length });
+  const enroll = await Enrollment.findOne({ user: req.user._id, course });
+  res.status(200).json({ status: "success", data: !!enroll });
 });
 
-const getEnrolledCourses = getAllDocs(Enrollment, true);
+const coursePop = { path: "course", select: "title price description image" };
 
-const getAllPayments = getAllDocs(Enrollment);
+const getEnrolledCourses = getAllDocs(Enrollment, true, coursePop);
+
+const getAllPayments = getAllDocs(Enrollment, false, [
+  { path: "user", select: "name" },
+  coursePop,
+]);
 
 module.exports = {
   getCheckoutSession,
   webhookHandler,
-  createEnrollment,
+  // createEnrollment,
   checkIfCourseEnrolled,
   getEnrolledCourses,
   getAllPayments,

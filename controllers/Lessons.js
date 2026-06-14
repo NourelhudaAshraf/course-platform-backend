@@ -1,5 +1,5 @@
 const Lesson = require("../models/Lessons");
-const { v2: cloudinary } = require("cloudinary");
+const cloudinary = require("../config/cloudinary");
 const streamifier = require("streamifier");
 const {
   getAllDocs,
@@ -8,15 +8,13 @@ const {
   createOne,
   deleteOne,
 } = require("./handleFactory");
+const catchAsync = require("../utils/catchAsync");
 
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+const getAllLessons = getAllDocs(Lesson, null, {
+  path: "course",
+  select: "title",
 });
-
-const getAllLessons = getAllDocs(Lesson);
-const getLessonById = getOne(Lesson);
+const getLessonById = getOne(Lesson, { path: "course", select: "title" });
 const updateLessonById = updateOne(Lesson);
 const createLesson = createOne(Lesson);
 const deleteLesson = deleteOne(Lesson);
@@ -27,7 +25,7 @@ const setCourseId = (req, res, next) => {
   next();
 };
 
-const uploadVideo = async (req, res, next) => {
+const uploadVideo = catchAsync(async (req, res, next) => {
   try {
     if (!req.file) return next();
     const result = await new Promise((resolve, reject) => {
@@ -65,7 +63,7 @@ const uploadVideo = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-};
+});
 
 module.exports = {
   getAllLessons,

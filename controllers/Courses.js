@@ -1,29 +1,59 @@
 const Course = require("../models/Courses");
-const { v2: cloudinary } = require("cloudinary");
+const Lesson = require("../models/Lessons");
+const Enrollment = require("../models/Enrollments");
+const UserLesson = require("../models/UserLessons");
+const cloudinary = require("../config/cloudinary");
 const streamifier = require("streamifier");
+const catchAsync = require("../utils/catchAsync");
 const {
   getAllDocs,
   getOne,
   updateOne,
   createOne,
-  deleteOne,
 } = require("./handleFactory");
 
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+const getAllCourses = getAllDocs(Course, null, {
+  path: "user",
+  select: "name",
 });
-
-const getAllCourses = getAllDocs(Course);
-const getCourseById = getOne(Course);
+const getCourseById = getOne(Course, { path: "user", select: "name" });
 const updateCourseById = updateOne(Course);
 const createCourse = createOne(Course);
-const deleteCourse = deleteOne(Course);
+const deleteCourse = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+
+  const course = await Course.findById(id);
+  if (!course) {
+    return next({ status: 404, message: "Item not found!" });
+  }
+
+  const lessonIds = await Lesson.find({ course: id }).distinct("_id");
+
+  await Promise.all([
+    UserLesson.deleteMany({ lesson: { $in: lessonIds } }),
+    Lesson.deleteMany({ course: id }),
+    Enrollment.deleteMany({ course: id }),
+  ]);
+
+  await Course.findByIdAndDelete(id);
+
+  res.status(204).send();
+});
 
 //middleware
 const setUserId = (req, res, next) => {
   if (!req.body.user) req.body.user = req.user._id;
+  next();
+};
+
+const authorizedToEditCourse = async (req, res, next) => {
+  const course = await Course.findById(req.params.id);
+  if (!course.user.equals(req.user._id)) {
+    return next({
+      status: 403,
+      message: "You are not authorized to edit this course",
+    });
+  }
   next();
 };
 
@@ -56,4 +86,5 @@ module.exports = {
   deleteCourse,
   setUserId,
   uploadImage,
+  authorizedToEditCourse,
 };

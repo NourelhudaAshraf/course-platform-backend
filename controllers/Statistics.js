@@ -22,7 +22,7 @@ const getDate = (month, date) => {
 
 const getStatistics = catchAsync(async (req, res, next) => {
   //Users
-  const totalUsers = await User.find({ role: "user" });
+  const totalUsers = await User.countDocuments({ role: "user" });
   const startOfMonth = getDate(new Date().getMonth(), 1);
   const newUsersThisMonth = await User.countDocuments({
     role: "user",
@@ -30,10 +30,12 @@ const getStatistics = catchAsync(async (req, res, next) => {
   });
 
   //Courses
-  const totalCourses = await Course.find();
+  const totalCourses = await Course.countDocuments();
 
   //Enrollment
-  const totalEnrollments = await Enrollment.find({ paymentStatus: "paid" });
+  const totalEnrollments = await Enrollment.countDocuments({
+    paymentStatus: "paid",
+  });
   const newEnrollmentsThisMonth = await Enrollment.countDocuments({
     paymentStatus: "paid",
     createdAt: { $gte: startOfMonth },
@@ -54,8 +56,8 @@ const getStatistics = catchAsync(async (req, res, next) => {
       $lte: endOfLastMonth,
     },
   });
-  const current = thisMonthRevenue[0]?.total || 0;
-  const previous = lastMonthRevenue[0]?.total || 0;
+  const current = thisMonthRevenue[0]?.totalRevenue || 0;
+  const previous = lastMonthRevenue[0]?.totalRevenue || 0;
 
   let revenueChange = 0;
 
@@ -66,9 +68,9 @@ const getStatistics = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: "success",
     data: {
-      totalUsers: totalUsers.length,
-      totalCourses: totalCourses.length,
-      totalEnrollments: totalEnrollments.length,
+      totalUsers,
+      totalCourses,
+      totalEnrollments,
       totalRevenue,
       newUsersThisMonth,
       newEnrollmentsThisMonth,
