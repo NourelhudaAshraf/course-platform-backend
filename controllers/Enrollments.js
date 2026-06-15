@@ -119,7 +119,14 @@ const checkIfCourseEnrolled = catchAsync(async (req, res, next) => {
   res.status(200).json({ status: "success", data: !!enroll });
 });
 
-const coursePop = { path: "course", select: "title price description image" };
+const coursePop = {
+  path: "course",
+  select: "title price description image user",
+  populate: {
+    path: "user",
+    select: "name",
+  },
+};
 
 const getEnrolledCourses = getAllDocs(Enrollment, true, coursePop);
 
