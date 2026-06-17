@@ -7,7 +7,7 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
   message: {
     status: "error",
-    message: "Too many auth attempts, try again later",
+    message: "Too many auth attempts, try again later after 15 minutes",
   },
 });
 
@@ -24,7 +24,26 @@ const uploadLimiter = rateLimit({
   max: 30,
   standardHeaders: true,
   legacyHeaders: false,
-  message: { status: "error", message: "Too many uploads, try again later" },
+  message: {
+    status: "error",
+    message: "Too many uploads, try again later after 1 hour",
+  },
 });
 
-module.exports = { authLimiter, webhookLimiter, uploadLimiter };
+const forgotPasswordLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 3,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    status: "error",
+    message: "Too many requests, try again later after 1 hour",
+  },
+});
+
+module.exports = {
+  authLimiter,
+  webhookLimiter,
+  uploadLimiter,
+  forgotPasswordLimiter,
+};

@@ -1,6 +1,6 @@
 const express = require("express");
 const { uploadImage: imageUpload } = require("../config/multer");
-const { uploadLimiter } = require("../middleware/rateLimit");
+const { uploadLimiter } = require("../middleware/rate-limit.middleware");
 const {
   getAllCourses,
   createCourse,
@@ -10,15 +10,15 @@ const {
   setUserId,
   uploadImage,
   authorizedToEditCourse,
-} = require("../controllers/Courses");
-const { protect, restrictTo } = require("../middleware/Auth");
-const lessonRouter = require("./Lessons");
+} = require("../controllers/course.controller");
+const { protect, restrictTo } = require("../middleware/auth.middleware");
+const lessonRouter = require("./lesson.routes");
 
 const {
   createCourseSchema,
   updateCourseSchema,
-} = require("../validations/Courses");
-const validate = require("../utils/validateSchema");
+} = require("../validations/course.validation");
+const validate = require("../utils/validate-schema");
 const router = express.Router();
 
 router

@@ -1,4 +1,4 @@
-const catchAsync = require("../utils/catchAsync");
+const catchAsync = require("./catch-async");
 
 const deleteOne = (Model) =>
   catchAsync(async (req, res, next) => {
@@ -23,7 +23,7 @@ const updateOne = (Model) =>
   catchAsync(async (req, res, next) => {
     const { id } = req.params;
     const updatedOne = await Model.findByIdAndUpdate(id, req.body, {
-      returnDocument: "after",
+      new: true,
       runValidators: true,
     });
     if (!updatedOne) {

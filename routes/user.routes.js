@@ -1,5 +1,5 @@
 const express = require("express");
-const { protect, restrictTo } = require("../middleware/Auth");
+const { protect, restrictTo } = require("../middleware/auth.middleware");
 const {
   getAllUsers,
   getUserById,
@@ -7,15 +7,15 @@ const {
   updateMe,
   getLatestUsers,
   promoteUserToAdmin,
-} = require("../controllers/Users");
+} = require("../controllers/user.controller");
 const {
   watchLesson,
   getCompletedLessons,
-} = require("../controllers/UserLessons");
-const { watchLessonSchema } = require("../validations/UserLessons");
-const { updateUserSchema } = require("../validations/Auth");
-const validate = require("../utils/validateSchema");
-const { requireEnrollment } = require("../middleware/enrollment");
+} = require("../controllers/user-lesson.controller");
+const { watchLessonSchema } = require("../validations/user-lesson.validation");
+const { updateUserSchema } = require("../validations/auth.validation");
+const validate = require("../utils/validate-schema");
+const { requireEnrollment } = require("../middleware/enrollment.middleware");
 
 const router = express.Router();
 

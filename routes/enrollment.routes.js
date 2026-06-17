@@ -2,14 +2,14 @@ const express = require("express");
 
 const router = express.Router();
 
-const { protect, restrictTo } = require("../middleware/Auth");
+const { protect, restrictTo } = require("../middleware/auth.middleware");
 const {
   getCheckoutSession,
   // createEnrollment,
   checkIfCourseEnrolled,
   getEnrolledCourses,
   getAllPayments,
-} = require("../controllers/Enrollments");
+} = require("../controllers/enrollment.controller");
 
 // router.get("/success", createEnrollment);
 

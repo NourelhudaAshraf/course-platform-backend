@@ -1,7 +1,7 @@
-const Course = require("../models/Courses");
-const Enrollment = require("../models/Enrollments");
-const User = require("../models/Users");
-const catchAsync = require("../utils/catchAsync");
+const Course = require("../models/course.model");
+const Enrollment = require("../models/enrollment.model");
+const User = require("../models/user.model");
+const catchAsync = require("../utils/catch-async");
 
 const getRevenueOfMonth = async (createdAtFilter) => {
   const res = await Enrollment.aggregate([
@@ -48,8 +48,9 @@ const getStatistics = catchAsync(async (req, res, next) => {
     createdAt: { $gte: startOfMonth },
   });
   //last Month Revenue
-  const startOfLastMonth = getDate(new Date().getMonth() - 1, 1);
-  const endOfLastMonth = getDate(new Date().getMonth() - 1, 0);
+  const now = new Date();
+  const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
   const lastMonthRevenue = await getRevenueOfMonth({
     createdAt: {
       $gte: startOfLastMonth,

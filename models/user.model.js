@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -25,6 +26,14 @@ const userSchema = new mongoose.Schema({
     minlength: 8,
     select: false, // to not return the password in the response
   },
+  resetPasswordToken: {
+    type: String,
+    select: false,
+  },
+  resetPasswordExpires: {
+    type: Date,
+    select: false,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
@@ -48,6 +57,17 @@ userSchema.methods.correctPassword = async function (
 ) {
   // this.password -> i can not use this because its select: false
   return await bcrypt.compare(candidatePassword, userPassword);
+};
+
+userSchema.methods.createResetPasswordToken = function () {
+  const resetToken = crypto.randomBytes(32).toString("hex");
+  // create a hash of the reset token
+  this.resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+  this.resetPasswordExpires = Date.now() + 10 * 60 * 1000;
+  return resetToken;
 };
 
 const User = mongoose.model("User", userSchema);

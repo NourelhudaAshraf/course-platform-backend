@@ -2,18 +2,21 @@ const express = require("express");
 const dotenv = require("dotenv");
 dotenv.config({ path: "./.env" });
 require("./config/cloudinary");
-const authRouter = require("./routes/Auth");
-const courseRouter = require("./routes/Courses");
-const userRouter = require("./routes/Users");
-const lessonRouter = require("./routes/Lessons");
-const enrollmentRouter = require("./routes/Enrollment");
-const statisticsRouter = require("./routes/Statistics");
-const { webhookHandler } = require("./controllers/Enrollments");
+const authRouter = require("./routes/auth.routes");
+const courseRouter = require("./routes/course.routes");
+const userRouter = require("./routes/user.routes");
+const lessonRouter = require("./routes/lesson.routes");
+const enrollmentRouter = require("./routes/enrollment.routes");
+const statisticsRouter = require("./routes/statistics.routes");
+const { webhookHandler } = require("./controllers/enrollment.controller");
 const cors = require("cors");
-const connectDB = require("./utils/connectDB");
+const connectDB = require("./utils/connect-db");
 const cookieParser = require("cookie-parser");
 const helmet = require("helmet");
-const { authLimiter, webhookLimiter } = require("./middleware/rateLimit");
+const {
+  authLimiter,
+  webhookLimiter,
+} = require("./middleware/rate-limit.middleware");
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -46,7 +49,9 @@ app.use("/api/v1/lessons", lessonRouter);
 app.use("/api/v1/enrollment", enrollmentRouter);
 app.use("/api/v1/statistics", statisticsRouter);
 
-// handle errors globally
+// to match any route that is not defined
+app.use((req, res, next) => next({ status: 404, message: "Route not found" }));
+
 app.use((err, req, res, next) => {
   if (err.name === "MulterError") {
     return res.status(400).json({

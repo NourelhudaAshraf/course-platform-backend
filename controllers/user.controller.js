@@ -1,10 +1,23 @@
-const User = require("../models/Users");
-const catchAsync = require("../utils/catchAsync");
-const { getAllDocs, getOne, updateOne, deleteOne } = require("./handleFactory");
+const User = require("../models/user.model");
+const catchAsync = require("../utils/catch-async");
+const { getAllDocs, getOne } = require("../utils/handle-factory");
+const UserLesson = require("../models/user-lesson.model");
+const Enrollment = require("../models/enrollment.model");
 
 const getAllUsers = getAllDocs(User);
 const getUserById = getOne(User);
-const deleteUser = deleteOne(User);
+
+const deleteUser = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const user = await User.findById(id);
+  if (!user) return next({ status: 404, message: "Item not found!" });
+  await Promise.all([
+    UserLesson.deleteMany({ user: id }),
+    Enrollment.deleteMany({ user: id }),
+  ]);
+  await User.findByIdAndDelete(id);
+  res.status(204).send();
+});
 
 const filteredBody = (body, ...allowedFields) => {
   const newBody = {};
@@ -45,7 +58,11 @@ const getLatestUsers = catchAsync(async (req, res, next) => {
 });
 
 const promoteUserToAdmin = catchAsync(async (req, res, next) => {
-  const user = await User.findByIdAndUpdate(req.params.id, { role: "admin" });
+  const user = await User.findByIdAndUpdate(
+    req.params.id,
+    { role: "admin" },
+    { new: true },
+  );
   if (!user) {
     return next({ status: 404, message: "User not found" });
   }

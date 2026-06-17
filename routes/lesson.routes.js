@@ -1,6 +1,6 @@
 const express = require("express");
 const { uploadVideo: videoUpload } = require("../config/multer");
-const { uploadLimiter } = require("../middleware/rateLimit");
+const { uploadLimiter } = require("../middleware/rate-limit.middleware");
 const {
   getAllLessons,
   createLesson,
@@ -9,15 +9,15 @@ const {
   deleteLesson,
   setCourseId,
   uploadVideo,
-} = require("../controllers/Lessons");
-const { protect, restrictTo } = require("../middleware/Auth");
-const { getLessonProgress } = require("../controllers/UserLessons");
+} = require("../controllers/lesson.controller");
+const { protect, restrictTo } = require("../middleware/auth.middleware");
+const { getLessonProgress } = require("../controllers/user-lesson.controller");
 const {
   createLessonSchema,
   updateLessonSchema,
-} = require("../validations/Lessons");
-const validate = require("../utils/validateSchema");
-const { requireEnrollment } = require("../middleware/enrollment");
+} = require("../validations/lesson.validation");
+const validate = require("../utils/validate-schema");
+const { requireEnrollment } = require("../middleware/enrollment.middleware");
 const router = express.Router({ mergeParams: true });
 
 router

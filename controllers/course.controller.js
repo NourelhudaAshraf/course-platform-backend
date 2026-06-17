@@ -1,16 +1,16 @@
-const Course = require("../models/Courses");
-const Lesson = require("../models/Lessons");
-const Enrollment = require("../models/Enrollments");
-const UserLesson = require("../models/UserLessons");
+const Course = require("../models/course.model");
+const Lesson = require("../models/lesson.model");
+const Enrollment = require("../models/enrollment.model");
+const UserLesson = require("../models/user-lesson.model");
 const cloudinary = require("../config/cloudinary");
 const streamifier = require("streamifier");
-const catchAsync = require("../utils/catchAsync");
+const catchAsync = require("../utils/catch-async");
 const {
   getAllDocs,
   getOne,
   updateOne,
   createOne,
-} = require("./handleFactory");
+} = require("../utils/handle-factory");
 
 const getAllCourses = getAllDocs(Course, null, {
   path: "user",

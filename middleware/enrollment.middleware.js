@@ -1,7 +1,7 @@
-const Enrollment = require("../models/Enrollments");
-const Course = require("../models/Courses");
-const Lesson = require("../models/Lessons");
-const catchAsync = require("../utils/catchAsync");
+const Enrollment = require("../models/enrollment.model");
+const Course = require("../models/course.model");
+const Lesson = require("../models/lesson.model");
+const catchAsync = require("../utils/catch-async");
 
 const requireEnrollment = catchAsync(async (req, res, next) => {
   if (req.user.role === "admin") return next();

@@ -1,7 +1,7 @@
-const UserLesson = require("../models/UserLessons");
-const User = require("../models/Users");
-const Lesson = require("../models/Lessons");
-const catchAsync = require("../utils/catchAsync");
+const UserLesson = require("../models/user-lesson.model");
+const User = require("../models/user.model");
+const Lesson = require("../models/lesson.model");
+const catchAsync = require("../utils/catch-async");
 
 const watchLesson = catchAsync(async (req, res, next) => {
   const { lessonId, lastPosition } = req.body;

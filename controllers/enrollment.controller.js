@@ -1,9 +1,9 @@
 const Stripe = require("stripe");
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-const Course = require("../models/Courses");
-const Enrollment = require("../models/Enrollments");
-const catchAsync = require("../utils/catchAsync");
-const { getAllDocs } = require("./handleFactory");
+const Course = require("../models/course.model");
+const Enrollment = require("../models/enrollment.model");
+const catchAsync = require("../utils/catch-async");
+const { getAllDocs } = require("../utils/handle-factory");
 
 const getCheckoutSession = catchAsync(async (req, res, next) => {
   const id = req.params.courseId;

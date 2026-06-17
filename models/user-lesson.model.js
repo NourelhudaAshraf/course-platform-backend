@@ -5,10 +5,12 @@ const userLessonSchema = new mongoose.Schema(
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      required: [true, "User is required"],
     },
     lesson: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Lesson",
+      required: [true, "Lesson is required"],
     },
     completed: {
       type: Boolean,

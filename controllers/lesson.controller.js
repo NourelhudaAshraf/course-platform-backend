@@ -1,4 +1,5 @@
-const Lesson = require("../models/Lessons");
+const Lesson = require("../models/lesson.model");
+const UserLesson = require("../models/user-lesson.model");
 const cloudinary = require("../config/cloudinary");
 const streamifier = require("streamifier");
 const {
@@ -6,9 +7,8 @@ const {
   getOne,
   updateOne,
   createOne,
-  deleteOne,
-} = require("./handleFactory");
-const catchAsync = require("../utils/catchAsync");
+} = require("../utils/handle-factory");
+const catchAsync = require("../utils/catch-async");
 
 const getAllLessons = getAllDocs(Lesson, null, {
   path: "course",
@@ -17,7 +17,15 @@ const getAllLessons = getAllDocs(Lesson, null, {
 const getLessonById = getOne(Lesson, { path: "course", select: "title" });
 const updateLessonById = updateOne(Lesson);
 const createLesson = createOne(Lesson);
-const deleteLesson = deleteOne(Lesson);
+
+const deleteLesson = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const lesson = await Lesson.findById(id);
+  if (!lesson) return next({ status: 404, message: "Item not found!" });
+  await UserLesson.deleteMany({ lesson: id });
+  await Lesson.findByIdAndDelete(id);
+  res.status(204).send();
+});
 
 //middleware
 const setCourseId = (req, res, next) => {
