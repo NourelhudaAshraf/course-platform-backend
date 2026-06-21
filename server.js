@@ -1,6 +1,7 @@
 const express = require("express");
 const dotenv = require("dotenv");
 dotenv.config({ path: "./.env" });
+const env = require("./config/env");
 require("./config/cloudinary");
 const authRouter = require("./routes/auth.routes");
 const courseRouter = require("./routes/course.routes");
@@ -19,7 +20,7 @@ const {
 } = require("./middleware/rate-limit.middleware");
 
 const app = express();
-const port = process.env.PORT || 8080;
+const port = env.PORT;
 
 connectDB();
 
@@ -38,8 +39,10 @@ app.post(
   express.raw({ type: "application/json" }),
   webhookHandler,
 );
+// sets HTTP security headers like X-Frame-Options: SAMEORIGIN.
 app.use(helmet());
 app.use(express.json({ limit: "1mb" }));
+// parses cookies from the request and adds them to the request object.
 app.use(cookieParser());
 
 app.use("/api/v1/auth", authLimiter, authRouter);

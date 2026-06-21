@@ -5,6 +5,7 @@ const UserLesson = require("../models/user-lesson.model");
 const cloudinary = require("../config/cloudinary");
 const streamifier = require("streamifier");
 const catchAsync = require("../utils/catch-async");
+const { destroyFromUrl } = require("../utils/cloudinary");
 const {
   getAllDocs,
   getOne,
@@ -27,7 +28,15 @@ const deleteCourse = catchAsync(async (req, res, next) => {
     return next({ status: 404, message: "Item not found!" });
   }
 
-  const lessonIds = await Lesson.find({ course: id }).distinct("_id");
+  const lessons = await Lesson.find({ course: id }).select("videoUrl");
+  const lessonIds = lessons.map((lesson) => lesson._id);
+
+  const cloudinaryDeletes = [];
+  if (course.image) cloudinaryDeletes.push(destroyFromUrl(course.image));
+  lessons.forEach((lesson) => {
+    if (lesson.videoUrl) cloudinaryDeletes.push(destroyFromUrl(lesson.videoUrl));
+  });
+  await Promise.allSettled(cloudinaryDeletes);
 
   await Promise.all([
     UserLesson.deleteMany({ lesson: { $in: lessonIds } }),
@@ -57,26 +66,28 @@ const authorizedToEditCourse = async (req, res, next) => {
   next();
 };
 
-const uploadImage = async (req, res, next) => {
-  try {
-    if (!req.file) return next();
-    const result = await new Promise((resolve, reject) => {
-      const stream = cloudinary.uploader.upload_stream(
-        { folder: "courses" },
-        (error, result) => {
-          if (error) reject(error);
-          else resolve(result);
-        },
-      );
-      streamifier.createReadStream(req.file.buffer).pipe(stream);
-    });
+const uploadImage = catchAsync(async (req, res, next) => {
+  if (!req.file) return next();
 
-    req.body.image = result.secure_url;
-    next();
-  } catch (error) {
-    next(error);
+  if (req.params.id) {
+    const course = await Course.findById(req.params.id).select("image");
+    if (course?.image) await destroyFromUrl(course.image);
   }
-};
+
+  const result = await new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder: "courses" },
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result);
+      },
+    );
+    streamifier.createReadStream(req.file.buffer).pipe(stream);
+  });
+
+  req.body.image = result.secure_url;
+  next();
+});
 
 module.exports = {
   getAllCourses,

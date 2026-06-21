@@ -47,6 +47,6 @@ router.patch(
   updatePassword,
 );
 router.get("/me", protect, getMe, getUserById);
-router.get("/logout", logout);
+router.post("/logout", protect, logout);
 
 module.exports = router;

@@ -3,6 +3,7 @@ const { uploadVideo: videoUpload } = require("../config/multer");
 const { uploadLimiter } = require("../middleware/rate-limit.middleware");
 const {
   getAllLessons,
+  getLessonsWithoutVideo,
   createLesson,
   getLessonById,
   updateLessonById,
@@ -20,9 +21,11 @@ const validate = require("../utils/validate-schema");
 const { requireEnrollment } = require("../middleware/enrollment.middleware");
 const router = express.Router({ mergeParams: true });
 
+router.get("/general", getLessonsWithoutVideo);
+
 router
   .route("/")
-  .get(getAllLessons)
+  .get(protect, requireEnrollment, getAllLessons)
   .post(
     protect,
     restrictTo("admin"),
@@ -40,7 +43,10 @@ router
   .patch(
     protect,
     restrictTo("admin"),
+    uploadLimiter,
+    videoUpload.single("video"),
     validate(updateLessonSchema),
+    uploadVideo,
     updateLessonById,
   )
   .delete(protect, restrictTo("admin"), deleteLesson);

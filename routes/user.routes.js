@@ -27,7 +27,12 @@ router.post(
   requireEnrollment,
   watchLesson,
 );
-router.get("/courses/:courseId/user-lessons", protect, getCompletedLessons);
+router.get(
+  "/courses/:courseId/user-lessons",
+  protect,
+  requireEnrollment,
+  getCompletedLessons,
+);
 router.use(protect, restrictTo("admin"));
 router.route("/").get(getAllUsers);
 router.route("/latest-users").get(getLatestUsers);

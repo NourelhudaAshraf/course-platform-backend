@@ -10,6 +10,8 @@ const videoMimes = [
   "video/x-msvideo",
 ];
 
+// cb -> callback function that tells Multer whether to accept or reject the file.
+// cb(Error, boolean)
 const imageFilter = (req, file, cb) => {
   if (imageMimes.includes(file.mimetype)) {
     cb(null, true);
