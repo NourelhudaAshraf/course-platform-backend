@@ -16,10 +16,6 @@ const userLessonSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    progress: {
-      type: String,
-      default: "0%",
-    },
     lastPosition: {
       type: Number,
       default: 0,

@@ -1,7 +1,10 @@
 const validate = (schema) => {
   return (req, res, next) => {
     // stripUnknown: true is used to delete any unknown fields from the request body
-    const { error } = schema.validate(req.body, { stripUnknown: true });
+    const { error } = schema.validate(req.body, {
+      stripUnknown: true,
+      convert: true,
+    });
     if (error) {
       return next({
         status: 400,

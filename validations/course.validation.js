@@ -6,8 +6,8 @@ const createCourseSchema = joi.object({
     "string.max": "Title must be less than 100 characters long",
     "any.required": "Title is required",
   }),
-  description: joi.string().min(10).max(1000).required().messages({
-    "string.min": "Description must be at least 10 characters long",
+  description: joi.string().min(8).max(1000).required().messages({
+    "string.min": "Description must be at least 8 characters long",
     "string.max": "Description must be less than 1000 characters long",
     "any.required": "Description is required",
   }),
@@ -22,8 +22,8 @@ const updateCourseSchema = joi.object({
     "string.min": "Title must be at least 3 characters long",
     "string.max": "Title must be less than 100 characters long",
   }),
-  description: joi.string().min(10).max(1000).messages({
-    "string.min": "Description must be at least 10 characters long",
+  description: joi.string().min(8).max(1000).messages({
+    "string.min": "Description must be at least 8 characters long",
     "string.max": "Description must be less than 1000 characters long",
   }),
   price: joi.number().min(0.01).messages({

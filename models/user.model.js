@@ -34,6 +34,9 @@ const userSchema = new mongoose.Schema({
     type: Date,
     select: false,
   },
+  passwordChangedAt: {
+    type: Date,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

@@ -1,9 +1,7 @@
 const express = require("express");
-// const { check } = require("express-validator");
 const {
   signup,
   login,
-  getMe,
   logout,
   forgotPassword,
   resetPassword,
@@ -18,16 +16,13 @@ const {
   updatePasswordSchema,
 } = require("../validations/auth.validation");
 const validate = require("../utils/validate-schema");
-const { protect } = require("../middleware/auth.middleware");
-const { forgotPasswordLimiter } = require("../middleware/rate-limit.middleware");
+const { protect, getMe } = require("../middleware/auth.middleware");
+const {
+  forgotPasswordLimiter,
+} = require("../middleware/rate-limit.middleware");
 const router = express.Router();
 
-router.post(
-  "/signup",
-  // check("email").isEmail().withMessage("Invalid email"),
-  validate(signupSchema),
-  signup,
-);
+router.post("/signup", validate(signupSchema), signup);
 router.post("/login", validate(loginSchema), login);
 router.post(
   "/forgot-password",

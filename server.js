@@ -22,14 +22,9 @@ const {
 const app = express();
 const port = env.PORT;
 
-connectDB();
-
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "https://course-platform-three-psi.vercel.app",
-    ],
+    origin: ["http://localhost:3000", env.FRONTEND_URL],
     credentials: true,
   }),
 );
@@ -70,13 +65,33 @@ app.use((err, req, res, next) => {
       .status(400)
       .json({ status: "error", message: "Invalid ID format" });
   }
-  err.status = err.status || 500;
+  if (err.code === 11000) {
+    const field = Object.keys(err.keyValue || {})[0];
+    const message =
+      field === "email"
+        ? "Email already exists"
+        : "Duplicate field value entered";
+    return res.status(409).json({ status: "error", message });
+  }
+  if (err.name === "ValidationError") {
+    const message = Object.values(err.errors)
+      .map((e) => e.message)
+      .join(". ");
+    return res.status(400).json({ status: "error", message });
+  }
+  err.status = err.status ?? 500;
   res.status(err.status).json({
     status: "error",
     message: err.message,
   });
 });
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}...`);
+const startServer = async () => {
+  await connectDB();
+  app.listen(port, () => console.log(`Server is running on port ${port}...`));
+};
+
+startServer().catch((err) => {
+  console.error("Failed to start server:", err);
+  process.exit(1);
 });

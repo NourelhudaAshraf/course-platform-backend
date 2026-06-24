@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user.model");
+const env = require("../config/env");
 
 const protect = async (req, res, next) => {
   try {
@@ -17,12 +18,21 @@ const protect = async (req, res, next) => {
       return next({ status: 401, message: "You are not logged in!" });
     }
     // verify returns payload
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, env.JWT_SECRET);
     const currentUser = await User.findById(decoded.id);
     if (!currentUser) {
       return next({ status: 401, message: "Invalid token!" });
     }
-
+    //decoded.iat * 1000 is the timestamp of the token creation (issued at) in ms
+    if (
+      currentUser.passwordChangedAt &&
+      decoded.iat * 1000 < currentUser.passwordChangedAt.getTime() - 1000
+    ) {
+      return next({
+        status: 401,
+        message: "Token expired. Please log in again.",
+      });
+    }
     req.user = currentUser;
     next();
   } catch (e) {
@@ -45,7 +55,13 @@ const restrictTo = (...roles) => {
   };
 };
 
+const getMe = (req, res, next) => {
+  req.params.id = req.user._id;
+  next();
+};
+
 module.exports = {
   protect,
   restrictTo,
+  getMe,
 };

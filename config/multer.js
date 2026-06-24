@@ -16,7 +16,9 @@ const imageFilter = (req, file, cb) => {
   if (imageMimes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error("Only JPEG, PNG, WebP, and GIF images are allowed"));
+    const error = new Error("Only JPEG, PNG, WebP, and GIF images are allowed");
+    error.status = 400;
+    cb(error);
   }
 };
 
@@ -24,7 +26,11 @@ const videoFilter = (req, file, cb) => {
   if (videoMimes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error("Only MP4, WebM, QuickTime, and AVI videos are allowed"));
+    const error = new Error(
+      "Only MP4, WebM, QuickTime, and AVI videos are allowed",
+    );
+    error.status = 400;
+    cb(error);
   }
 };
 

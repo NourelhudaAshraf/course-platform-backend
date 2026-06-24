@@ -1,83 +1,12 @@
-const Course = require("../models/course.model");
-const Enrollment = require("../models/enrollment.model");
-const User = require("../models/user.model");
 const catchAsync = require("../utils/catch-async");
-
-const getRevenueOfMonth = async (createdAtFilter) => {
-  const res = await Enrollment.aggregate([
-    { $match: { paymentStatus: "paid", ...(createdAtFilter ?? {}) } },
-    {
-      $group: {
-        _id: null,
-        totalRevenue: { $sum: "$price" },
-      },
-    },
-  ]);
-  return res;
-};
-
-const getDate = (month, date) => {
-  return new Date(new Date().getFullYear(), month, date);
-};
+const { getStatisticsService } = require("../services/statistics.service");
 
 const getStatistics = catchAsync(async (req, res, next) => {
-  //Users
-  const totalUsers = await User.countDocuments({ role: "user" });
-  const startOfMonth = getDate(new Date().getMonth(), 1);
-  const newUsersThisMonth = await User.countDocuments({
-    role: "user",
-    createdAt: { $gte: startOfMonth },
-  });
-
-  //Courses
-  const totalCourses = await Course.countDocuments();
-
-  //Enrollment
-  const totalEnrollments = await Enrollment.countDocuments({
-    paymentStatus: "paid",
-  });
-  const newEnrollmentsThisMonth = await Enrollment.countDocuments({
-    paymentStatus: "paid",
-    createdAt: { $gte: startOfMonth },
-  });
-  const result = await getRevenueOfMonth();
-  const totalRevenue = result[0]?.totalRevenue || 0;
-
-  //This Month Revenue
-  const thisMonthRevenue = await getRevenueOfMonth({
-    createdAt: { $gte: startOfMonth },
-  });
-  //last Month Revenue
-  const now = new Date();
-  const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-  const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
-  const lastMonthRevenue = await getRevenueOfMonth({
-    createdAt: {
-      $gte: startOfLastMonth,
-      $lte: endOfLastMonth,
-    },
-  });
-  const current = thisMonthRevenue[0]?.totalRevenue || 0;
-  const previous = lastMonthRevenue[0]?.totalRevenue || 0;
-
-  let revenueChange = 0;
-
-  if (previous > 0) {
-    revenueChange = ((current - previous) / previous) * 100;
-  }
-
+  const statistics = await getStatisticsService();
   res.status(200).json({
     status: "success",
-    data: {
-      totalUsers,
-      totalCourses,
-      totalEnrollments,
-      totalRevenue,
-      newUsersThisMonth,
-      newEnrollmentsThisMonth,
-      revenueChange,
-    },
+    data: statistics,
   });
 });
 
-module.exports = getStatistics;
+module.exports = { getStatistics };

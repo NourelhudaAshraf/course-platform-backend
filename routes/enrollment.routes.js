@@ -5,13 +5,10 @@ const router = express.Router();
 const { protect, restrictTo } = require("../middleware/auth.middleware");
 const {
   getCheckoutSession,
-  // createEnrollment,
   checkIfCourseEnrolled,
   getEnrolledCourses,
   getAllPayments,
 } = require("../controllers/enrollment.controller");
-
-// router.get("/success", createEnrollment);
 
 router.use(protect);
 router

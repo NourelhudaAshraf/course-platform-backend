@@ -8,7 +8,7 @@ const envSchema = joi
       .default("development"),
     PORT: joi.number().port().default(8080),
     DATABASE_URL: joi.string().required(),
-    JWT_SECRET: joi.string().min(1).required(),
+    JWT_SECRET: joi.string().min(32).required(),
     JWT_EXPIRES_IN: joi.string().required(),
     FRONTEND_URL: joi.string().uri().required(),
     STRIPE_SECRET_KEY: joi.string().required(),

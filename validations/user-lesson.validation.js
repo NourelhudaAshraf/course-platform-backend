@@ -7,7 +7,7 @@ const watchLessonSchema = joi.object({
     "string.length": "Lesson ID must be exactly 24 characters long",
   }),
   lastPosition: joi.number().min(0).required().messages({
-    "number.min": "Last position must be greater than 0",
+    "number.min": "Last position cannot be negative",
     "any.required": "Last position is required",
   }),
 });

@@ -8,17 +8,15 @@ const {
   getLessonById,
   updateLessonById,
   deleteLesson,
-  setCourseId,
-  uploadVideo,
 } = require("../controllers/lesson.controller");
 const { protect, restrictTo } = require("../middleware/auth.middleware");
-const { getLessonProgress } = require("../controllers/user-lesson.controller");
 const {
   createLessonSchema,
   updateLessonSchema,
 } = require("../validations/lesson.validation");
 const validate = require("../utils/validate-schema");
 const { requireEnrollment } = require("../middleware/enrollment.middleware");
+const { setCourseId, uploadVideo } = require("../middleware/lesson.middleware");
 const router = express.Router({ mergeParams: true });
 
 router.get("/general", getLessonsWithoutVideo);
@@ -50,13 +48,5 @@ router
     updateLessonById,
   )
   .delete(protect, restrictTo("admin"), deleteLesson);
-
-router.get(
-  "/:lessonId/progress",
-  protect,
-  restrictTo("user"),
-  requireEnrollment,
-  getLessonProgress,
-);
 
 module.exports = router;

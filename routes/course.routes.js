@@ -7,13 +7,14 @@ const {
   getCourseById,
   updateCourseById,
   deleteCourse,
-  setUserId,
-  uploadImage,
-  authorizedToEditCourse,
 } = require("../controllers/course.controller");
 const { protect, restrictTo } = require("../middleware/auth.middleware");
 const lessonRouter = require("./lesson.routes");
-
+const {
+  setUserId,
+  authorizedToEditCourse,
+  uploadImage,
+} = require("../middleware/course.middleware");
 const {
   createCourseSchema,
   updateCourseSchema,
