@@ -18,6 +18,8 @@ const envSchema = joi
     CLOUDINARY_API_SECRET: joi.string().required(),
     EMAIL_USER: joi.string().email().required(),
     EMAIL_PASSWORD: joi.string().required(),
+    DEV_API_URL: joi.string().required(),
+    PROD_API_URL: joi.string().uri().required(),
   })
   .unknown(true);
 

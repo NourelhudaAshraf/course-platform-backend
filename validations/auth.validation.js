@@ -46,6 +46,14 @@ const forgotPasswordSchema = joi.object({
   }),
 });
 
+const resetPasswordTokenParamSchema = joi.object({
+  token: joi.string().length(64).hex().required().messages({
+    "string.length": "Invalid reset token",
+    "string.hex": "Invalid reset token",
+    "any.required": "Reset token is required",
+  }),
+});
+
 const resetPasswordSchema = joi.object({
   password: joi.string().min(8).max(30).required().messages({
     "string.min": "Password must be at least 8 characters long",
@@ -79,6 +87,7 @@ module.exports = {
   loginSchema,
   updateUserSchema,
   forgotPasswordSchema,
+  resetPasswordTokenParamSchema,
   resetPasswordSchema,
   updatePasswordSchema,
 };

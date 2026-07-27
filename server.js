@@ -3,10 +3,12 @@ const dotenv = require("dotenv");
 dotenv.config({ path: "./.env" });
 const env = require("./config/env");
 require("./config/cloudinary");
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpec = require("./config/swagger");
+
 const authRouter = require("./routes/auth.routes");
 const courseRouter = require("./routes/course.routes");
 const userRouter = require("./routes/user.routes");
-const lessonRouter = require("./routes/lesson.routes");
 const enrollmentRouter = require("./routes/enrollment.routes");
 const statisticsRouter = require("./routes/statistics.routes");
 const { webhookHandler } = require("./controllers/enrollment.controller");
@@ -22,6 +24,7 @@ const {
 const app = express();
 const port = env.PORT;
 
+app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(
   cors({
     origin: ["http://localhost:3000", env.FRONTEND_URL],
@@ -43,7 +46,6 @@ app.use(cookieParser());
 app.use("/api/v1/auth", authLimiter, authRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/courses", courseRouter);
-app.use("/api/v1/lessons", lessonRouter);
 app.use("/api/v1/enrollment", enrollmentRouter);
 app.use("/api/v1/statistics", statisticsRouter);
 

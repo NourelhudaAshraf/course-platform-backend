@@ -19,6 +19,7 @@ const lessonSchema = new mongoose.Schema({
   order: {
     type: Number,
     required: true,
+    min: [1, "Order must be greater than 1"],
   },
   createdAt: {
     type: Date,
