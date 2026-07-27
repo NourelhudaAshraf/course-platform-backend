@@ -24,7 +24,22 @@ const {
 const app = express();
 const port = env.PORT;
 
-app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+// swagger-ui-dist assets are loaded from a CDN instead of node_modules
+// because serverless platforms (e.g. Vercel) don't reliably bundle the
+// static swagger-ui-dist files served via express.static, which breaks
+// SwaggerUIBundle initialization after deployment.
+const swaggerUiOptions = {
+  customCssUrl: "https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css",
+  customJs: [
+    "https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js",
+    "https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-standalone-preset.js",
+  ],
+};
+app.use(
+  "/swagger",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, swaggerUiOptions),
+);
 app.use(
   cors({
     origin: ["http://localhost:3000", env.FRONTEND_URL],
