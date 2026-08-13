@@ -11,7 +11,7 @@ const createValidator = (source) => (schema) => (req, res, next) => {
       }
     });
   }
-  const { error } = schema.validate(req[source], OPTIONS);
+  const { value, error } = schema.validate(req[source], OPTIONS);
   if (error) {
     console.log(error);
     return next({
@@ -19,6 +19,9 @@ const createValidator = (source) => (schema) => (req, res, next) => {
       message: error.details[0].message,
     });
   }
+  // params accumulate across nested routers (e.g. /courses/:courseId/lessons/:id),
+  // so merge instead of replacing to avoid dropping params validated by a parent router.
+  req[source] = source === "params" ? { ...req.params, ...value } : value;
   next();
 };
 

@@ -12,7 +12,7 @@ const createLessonSchema = joi.object({
     "any.required": "Description is required",
   }),
   order: joi.number().min(1).required().messages({
-    "number.min": "Order must be greater than 0",
+    "number.min": "Order must be greater than or equal to 1",
     "any.required": "Order is required",
   }),
 });
@@ -27,7 +27,7 @@ const updateLessonSchema = joi.object({
     "string.max": "Description must be less than 1000 characters long",
   }),
   order: joi.number().min(1).empty("").messages({
-    "number.min": "Order must be greater than 0",
+    "number.min": "Order must be greater than or equal to 1",
   }),
 });
 

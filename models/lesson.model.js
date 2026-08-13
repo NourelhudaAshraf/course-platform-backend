@@ -28,6 +28,9 @@ const lessonSchema = new mongoose.Schema({
 });
 lessonSchema.index({ course: 1, order: 1 }, { unique: true });
 
+lessonSchema.pre(/^find/, function () {
+  this.sort({ order: 1 });
+});
 const Lesson = mongoose.model("Lesson", lessonSchema);
 
 module.exports = Lesson;

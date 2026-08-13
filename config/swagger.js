@@ -1,20 +1,18 @@
 const swaggerJsdoc = require("swagger-jsdoc");
 const env = require("./env");
-
-const errorResponse = (description) => ({
-  description,
-  content: {
-    "application/json": {
-      schema: {
-        type: "object",
-        properties: {
-          status: { type: "string", example: "error" },
-          message: { type: "string" },
-        },
-      },
-    },
-  },
-});
+const authSchema = require("../swagger/schemas/auth.schema");
+const courseSchema = require("../swagger/schemas/course.schema");
+const lessonSchema = require("../swagger/schemas/lesson.schema");
+const userSchema = require("../swagger/schemas/user.schema");
+const enrollmentSchema = require("../swagger/schemas/enrollment.schema");
+const parameters = require("../swagger/parameters");
+const responses = require("../swagger/responses");
+const authPath = require("../swagger/paths/auth.path");
+const coursePath = require("../swagger/paths/courses.path");
+const enrollmentPath = require("../swagger/paths/enrollment.path");
+const lessonPath = require("../swagger/paths/lesson.path");
+const statisticsPath = require("../swagger/paths/statistics.path");
+const userPath = require("../swagger/paths/user.path");
 
 const options = {
   definition: {
@@ -24,16 +22,9 @@ const options = {
       version: "1.0.0",
       description: "Backend API Documentation",
     },
-    tags: [
-      { name: "Authentication" },
-      { name: "Users" },
-      { name: "Courses" },
-      { name: "Lessons" },
-      { name: "Enrollment" },
-      { name: "Statistics" },
-    ],
     servers: [
       {
+        // without it -> call current host server and add coursers without /api/v1
         url:
           env.NODE_ENV === "development"
             ? `${env.DEV_API_URL}:${env.PORT}/api/v1`
@@ -48,165 +39,26 @@ const options = {
           bearerFormat: "JWT",
         },
       },
-      parameters: {
-        IdParam: {
-          name: "id",
-          in: "path",
-          required: true,
-          description: "MongoDB ObjectId",
-          schema: { type: "string", pattern: "^[a-fA-F0-9]{24}$" },
-        },
-        CourseIdParam: {
-          name: "courseId",
-          in: "path",
-          required: true,
-          description: "MongoDB ObjectId",
-          schema: { type: "string", pattern: "^[a-fA-F0-9]{24}$" },
-        },
-        ResetTokenParam: {
-          name: "token",
-          in: "path",
-          required: true,
-          description: "Password reset token",
-          schema: { type: "string", minLength: 64, maxLength: 64 },
-        },
-        PageQuery: {
-          name: "page",
-          in: "query",
-          schema: { type: "integer", minimum: 1, default: 1 },
-        },
-        LimitQuery: {
-          name: "limit",
-          in: "query",
-          schema: { type: "integer", minimum: 1, maximum: 25, default: 10 },
-        },
-        SortQuery: {
-          name: "sort",
-          in: "query",
-          description: "Comma-separated fields; prefix with - for descending",
-          schema: { type: "string", example: "-createdAt" },
-        },
-        TitleQuery: {
-          name: "title",
-          in: "query",
-          description: "Filter by course title",
-          schema: { type: "string", maxLength: 100 },
-        },
-        MinPriceQuery: {
-          name: "minPrice",
-          in: "query",
-          schema: { type: "number", minimum: 0 },
-        },
-        MaxPriceQuery: {
-          name: "maxPrice",
-          in: "query",
-          schema: { type: "number", minimum: 0 },
-        },
-      },
       schemas: {
-        Signup: {
-          type: "object",
-          required: ["name", "email", "password"],
-          properties: {
-            name: { type: "string", minLength: 3, maxLength: 30 },
-            email: { type: "string", format: "email" },
-            password: { type: "string", minLength: 8, maxLength: 30 },
-          },
-        },
-        Login: {
-          type: "object",
-          required: ["email", "password"],
-          properties: {
-            email: { type: "string", format: "email" },
-            password: { type: "string", minLength: 8, maxLength: 30 },
-          },
-        },
-        ForgotPassword: {
-          type: "object",
-          required: ["email"],
-          properties: {
-            email: { type: "string", format: "email" },
-          },
-        },
-        ResetPassword: {
-          type: "object",
-          required: ["password"],
-          properties: {
-            password: { type: "string", minLength: 8, maxLength: 30 },
-          },
-        },
-        UpdatePassword: {
-          type: "object",
-          required: ["currentPassword", "newPassword"],
-          properties: {
-            currentPassword: { type: "string", minLength: 8, maxLength: 30 },
-            newPassword: { type: "string", minLength: 8, maxLength: 30 },
-          },
-        },
-        CreateCourse: {
-          type: "object",
-          required: ["title", "description", "price", "image"],
-          properties: {
-            title: { type: "string", minLength: 3, maxLength: 100 },
-            description: { type: "string", minLength: 8, maxLength: 1000 },
-            price: { type: "number", minimum: 0.01 },
-            image: { type: "string", format: "binary" },
-          },
-        },
-        UpdateCourse: {
-          type: "object",
-          properties: {
-            title: { type: "string", minLength: 3, maxLength: 100 },
-            description: { type: "string", minLength: 8, maxLength: 1000 },
-            price: { type: "number", minimum: 0.01 },
-            image: { type: "string", format: "binary" },
-          },
-        },
-        CreateLesson: {
-          type: "object",
-          required: ["title", "description", "video", "order"],
-          properties: {
-            title: { type: "string", minLength: 3, maxLength: 100 },
-            description: { type: "string", minLength: 8, maxLength: 1000 },
-            video: { type: "string", format: "binary" },
-            order: { type: "number", minimum: 1 },
-          },
-        },
-        UpdateLesson: {
-          type: "object",
-          properties: {
-            title: { type: "string", minLength: 3, maxLength: 100 },
-            description: { type: "string", minLength: 8, maxLength: 1000 },
-            video: { type: "string", format: "binary" },
-            order: { type: "number", minimum: 1 },
-          },
-        },
-        UpdateUser: {
-          type: "object",
-          properties: {
-            name: { type: "string", minLength: 3, maxLength: 30 },
-            email: { type: "string", format: "email" },
-          },
-        },
-        WatchLesson: {
-          type: "object",
-          required: ["lessonId", "lastPosition"],
-          properties: {
-            lessonId: { type: "string", pattern: "^[a-fA-F0-9]{24}$" },
-            lastPosition: { type: "number", minimum: 0 },
-          },
-        },
+        ...authSchema,
+        ...courseSchema,
+        ...enrollmentSchema,
+        ...lessonSchema,
+        ...userSchema,
       },
-      responses: {
-        BadRequest: errorResponse("Bad request"),
-        Unauthorized: errorResponse("Unauthorized"),
-        Forbidden: errorResponse("Forbidden"),
-        NotFound: errorResponse("Not found"),
-        ServerError: errorResponse("Internal server error"),
-      },
+      parameters,
+      responses,
+    },
+    paths: {
+      ...authPath,
+      ...coursePath,
+      ...enrollmentPath,
+      ...lessonPath,
+      ...statisticsPath,
+      ...userPath,
     },
   },
-  apis: ["./routes/*.js"],
+  apis: [],
 };
 
 module.exports = swaggerJsdoc(options);
