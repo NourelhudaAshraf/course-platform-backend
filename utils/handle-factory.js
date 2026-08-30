@@ -11,7 +11,7 @@ const deleteOne = (Model) =>
   });
 
 const createOne = (Model) =>
-  catchAsync(async (req, res, next) => {
+  catchAsync(async (req, res) => {
     const newDoc = await Model.create(req.body);
     res.status(201).json({
       status: "success",
@@ -56,6 +56,7 @@ const getAllDocs = (Model, getUser, popOptions) =>
     const queryObj = { ...req.query };
 
     // Fields not used for filtering
+    const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const excludedFields = ["page", "sort", "limit", "fields"];
     excludedFields.forEach((el) => delete queryObj[el]);
 
@@ -73,19 +74,23 @@ const getAllDocs = (Model, getUser, popOptions) =>
     // console.log(mongoFilter);
     // Title search (case-insensitive -> $options: "i" )
     if (queryObj.title) {
-      const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
       mongoFilter.title = {
         $regex: escapeRegex(queryObj.title),
         $options: "i",
       };
     }
     if (queryObj.searchUser) {
-      const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
       const cleanedName = escapeRegex(queryObj.searchUser);
       mongoFilter.$or = [
         { name: { $regex: cleanedName, $options: "i" } },
         { email: { $regex: cleanedName, $options: "i" } },
       ];
+    }
+    if (queryObj.code) {
+      mongoFilter.code = {
+        $regex: escapeRegex(queryObj.code),
+        $options: "i",
+      };
     }
     // console.log(mongoFilter);
     let query = Model.find(mongoFilter);

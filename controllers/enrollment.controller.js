@@ -18,6 +18,7 @@ const getCheckoutSession = catchAsync(async (req, res, next) => {
     req.params.courseId,
     req.user,
     stripe,
+    req.query.couponCode,
   );
   res.status(200).json({
     status: "success",

@@ -27,7 +27,20 @@ const uploadFileToCloudinary = async (file, folder) => {
   return { secure_url: result.secure_url, duration: result.duration };
 };
 
+const checkIfValidCoupon = (coupon) => {
+  if (!coupon) return false;
+  if (coupon.usageLimit !== null && coupon.usedCount >= coupon.usageLimit) {
+    return false;
+  }
+  const now = new Date();
+  if (!coupon.isActive || coupon.startDate > now || coupon.expiryDate < now) {
+    return false;
+  }
+  return true;
+};
+
 module.exports = {
   buildHtmlEmail,
   uploadFileToCloudinary,
+  checkIfValidCoupon,
 };

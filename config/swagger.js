@@ -4,6 +4,7 @@ const authSchema = require("../swagger/schemas/auth.schema");
 const courseSchema = require("../swagger/schemas/course.schema");
 const lessonSchema = require("../swagger/schemas/lesson.schema");
 const userSchema = require("../swagger/schemas/user.schema");
+const couponSchema = require("../swagger/schemas/coupon.schema");
 const enrollmentSchema = require("../swagger/schemas/enrollment.schema");
 const parameters = require("../swagger/parameters");
 const responses = require("../swagger/responses");
@@ -13,6 +14,7 @@ const enrollmentPath = require("../swagger/paths/enrollment.path");
 const lessonPath = require("../swagger/paths/lesson.path");
 const statisticsPath = require("../swagger/paths/statistics.path");
 const userPath = require("../swagger/paths/user.path");
+const couponPath = require("../swagger/paths/coupon.path");
 
 const definition = {
   openapi: "3.0.0",
@@ -44,6 +46,7 @@ const definition = {
       ...enrollmentSchema,
       ...lessonSchema,
       ...userSchema,
+      ...couponSchema,
     },
     parameters,
     responses,
@@ -55,6 +58,7 @@ const definition = {
     ...lessonPath,
     ...statisticsPath,
     ...userPath,
+    ...couponPath,
   },
 };
 
