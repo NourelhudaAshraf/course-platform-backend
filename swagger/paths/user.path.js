@@ -57,7 +57,7 @@ module.exports = {
                 type: "object",
                 properties: {
                   status: { type: "string", example: "success" },
-                  data: { $ref: "#/components/schemas/Lesson" },
+                  data: { $ref: "#/components/schemas/UserLesson" },
                 },
               },
             },
@@ -115,6 +115,7 @@ module.exports = {
       summary: "Get All Users",
       security: [{ bearerAuth: [] }],
       parameters: [
+        { $ref: "#/components/parameters/SearchUserQuery" },
         { $ref: "#/components/parameters/PageQuery" },
         { $ref: "#/components/parameters/LimitQuery" },
         { $ref: "#/components/parameters/SortQuery" },
@@ -245,7 +246,7 @@ module.exports = {
       tags: ["Users"],
       security: [{ bearerAuth: [] }],
       responses: {
-        200: { description: "User deleted successfully" },
+        204: { description: "User deleted successfully" },
         400: { $ref: "#/components/responses/BadRequest" },
         401: { $ref: "#/components/responses/Unauthorized" },
         403: { $ref: "#/components/responses/Forbidden" },

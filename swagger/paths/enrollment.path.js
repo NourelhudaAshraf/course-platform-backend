@@ -37,6 +37,11 @@ module.exports = {
       tags: ["Enrollment"],
       summary: "Get All Enrolled Courses of Current User",
       security: [{ bearerAuth: [] }],
+      parameters: [
+        { $ref: "#/components/parameters/PageQuery" },
+        { $ref: "#/components/parameters/LimitQuery" },
+        { $ref: "#/components/parameters/SortQuery" },
+      ],
       responses: {
         200: {
           description: "Enrolled courses retrieved successfully",
@@ -74,7 +79,7 @@ module.exports = {
       parameters: [{ $ref: "#/components/parameters/CourseIdParam" }],
       responses: {
         200: {
-          description: "Course enrolled successfully",
+          description: "Checks if course is enrolled or not",
           content: {
             "application/json": {
               schema: {

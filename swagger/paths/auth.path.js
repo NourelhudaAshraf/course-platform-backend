@@ -130,6 +130,7 @@ module.exports = {
         400: {
           $ref: "#/components/responses/BadRequest",
         },
+        401: { $ref: "#/components/responses/Unauthorized" },
         500: {
           $ref: "#/components/responses/ServerError",
         },

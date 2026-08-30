@@ -5,7 +5,7 @@ module.exports = {
       security: [{ bearerAuth: [] }],
       responses: {
         200: {
-          description: "All lessons retrieved successfully",
+          description: "All statistics retrieved successfully",
           content: {
             "application/json": {
               schema: {

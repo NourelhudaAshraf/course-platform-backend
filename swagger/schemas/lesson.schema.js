@@ -26,6 +26,17 @@ module.exports = {
       lastPosition: { type: "number", minimum: 0 },
     },
   },
+  UserLesson: {
+    type: "object",
+    properties: {
+      _id: { type: "string" },
+      user: { type: "string" },
+      lesson: { type: "string" },
+      lastPosition: { type: "number" },
+      completed: { type: "boolean" },
+      createdAt: { type: "string" },
+    },
+  },
   GeneralLesson: {
     type: "object",
     properties: {

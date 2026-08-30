@@ -5,8 +5,11 @@ const { destroyFromUrl } = require("../utils/cloudinary");
 const getLessonsWithoutVideoService = async (courseId) => {
   const lessons = await Lesson.find({ course: courseId })
     .populate("course", "title")
-    .select("-videoUrl -totalSeconds");
-  return lessons;
+    .select("-videoUrl");
+  return lessons.map((lesson) => ({
+    ...lesson.toObject(),
+    totalSeconds: (lesson.totalSeconds / 100).toFixed(2),
+  }));
 };
 
 const deleteLessonService = async (id) => {

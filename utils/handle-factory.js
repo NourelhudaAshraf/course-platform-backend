@@ -79,6 +79,14 @@ const getAllDocs = (Model, getUser, popOptions) =>
         $options: "i",
       };
     }
+    if (queryObj.searchUser) {
+      const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const cleanedName = escapeRegex(queryObj.searchUser);
+      mongoFilter.$or = [
+        { name: { $regex: cleanedName, $options: "i" } },
+        { email: { $regex: cleanedName, $options: "i" } },
+      ];
+    }
     // console.log(mongoFilter);
     let query = Model.find(mongoFilter);
 

@@ -14,51 +14,48 @@ const lessonPath = require("../swagger/paths/lesson.path");
 const statisticsPath = require("../swagger/paths/statistics.path");
 const userPath = require("../swagger/paths/user.path");
 
-const options = {
-  definition: {
-    openapi: "3.0.0",
-    info: {
-      title: "Course Platform API",
-      version: "1.0.0",
-      description: "Backend API Documentation",
-    },
-    servers: [
-      {
-        // without it -> call current host server and add coursers without /api/v1
-        url:
-          env.NODE_ENV === "development"
-            ? `${env.DEV_API_URL}:${env.PORT}/api/v1`
-            : `${env.PROD_API_URL}/api/v1`,
-      },
-    ],
-    components: {
-      securitySchemes: {
-        bearerAuth: {
-          type: "http",
-          scheme: "bearer",
-          bearerFormat: "JWT",
-        },
-      },
-      schemas: {
-        ...authSchema,
-        ...courseSchema,
-        ...enrollmentSchema,
-        ...lessonSchema,
-        ...userSchema,
-      },
-      parameters,
-      responses,
-    },
-    paths: {
-      ...authPath,
-      ...coursePath,
-      ...enrollmentPath,
-      ...lessonPath,
-      ...statisticsPath,
-      ...userPath,
-    },
+const definition = {
+  openapi: "3.0.0",
+  info: {
+    title: "Course Platform API",
+    version: "1.0.0",
+    description: "Backend API Documentation",
   },
-  apis: [],
+  servers: [
+    {
+      // without it -> call current host server and add coursers without /api/v1
+      url:
+        env.NODE_ENV === "development"
+          ? `${env.DEV_API_URL}:${env.PORT}/api/v1`
+          : `${env.PROD_API_URL}/api/v1`,
+    },
+  ],
+  components: {
+    securitySchemes: {
+      bearerAuth: {
+        type: "http",
+        scheme: "bearer",
+        bearerFormat: "JWT",
+      },
+    },
+    schemas: {
+      ...authSchema,
+      ...courseSchema,
+      ...enrollmentSchema,
+      ...lessonSchema,
+      ...userSchema,
+    },
+    parameters,
+    responses,
+  },
+  paths: {
+    ...authPath,
+    ...coursePath,
+    ...enrollmentPath,
+    ...lessonPath,
+    ...statisticsPath,
+    ...userPath,
+  },
 };
 
-module.exports = swaggerJsdoc(options);
+module.exports = definition;

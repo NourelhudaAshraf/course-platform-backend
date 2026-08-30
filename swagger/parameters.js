@@ -52,4 +52,10 @@ module.exports = {
     in: "query",
     schema: { type: "number", minimum: 0 },
   },
+  SearchUserQuery: {
+    name: "searchUser",
+    in: "query",
+    description: "Search by name or email",
+    schema: { type: "string", maxLength: 100 },
+  },
 };
