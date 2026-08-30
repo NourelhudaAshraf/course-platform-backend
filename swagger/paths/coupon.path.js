@@ -67,6 +67,8 @@ module.exports = {
       responses: {
         200: successResponse("List of coupons", true),
         400: { $ref: "#/components/responses/BadRequest" },
+        401: { $ref: "#/components/responses/Unauthorized" },
+        403: { $ref: "#/components/responses/Forbidden" },
         500: { $ref: "#/components/responses/ServerError" },
       },
     },

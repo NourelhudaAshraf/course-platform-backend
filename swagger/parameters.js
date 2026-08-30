@@ -58,4 +58,10 @@ module.exports = {
     description: "Search by name or email",
     schema: { type: "string", maxLength: 100 },
   },
+  CouponCode: {
+    name: "couponCode",
+    in: "query",
+    description: "Coupon Code",
+    schema: { type: "string", maxLength: 100 },
+  },
 };

@@ -176,9 +176,7 @@ const checkIfCourseEnrolledService = async (user, course) => {
   return !!enroll;
 };
 
-const enrolledCoursesService = async (userId) => {
-  const page = Number(req.query.page) || 1;
-  const limit = Math.min(Number(req.query.limit) || 10, 25);
+const enrolledCoursesService = async (userId, page, limit) => {
   const skip = (page - 1) * limit;
   const totalItems = await Enrollment.countDocuments();
   const totalPages = Math.ceil(totalItems / limit);

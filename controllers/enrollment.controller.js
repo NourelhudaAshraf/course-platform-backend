@@ -8,6 +8,7 @@ const {
   getCheckoutSessionService,
   webhookHandlerService,
   checkIfCourseEnrolledService,
+  enrolledCoursesService,
 } = require("../services/enrollment.service");
 const { coursePop } = require("../utils/constants");
 
@@ -53,7 +54,9 @@ const checkIfCourseEnrolled = catchAsync(async (req, res, next) => {
 
 const getEnrolledCourses = catchAsync(async (req, res) => {
   const userId = req.user._id;
-  const result = await enrolledCoursesService(userId);
+  const page = Number(req.query.page) || 1;
+  const limit = Math.min(Number(req.query.limit) || 10, 25);
+  const result = await enrolledCoursesService(userId, page, limit);
   res.status(200).json({
     status: "success",
     ...result,

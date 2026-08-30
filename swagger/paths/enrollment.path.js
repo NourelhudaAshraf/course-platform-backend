@@ -3,7 +3,10 @@ module.exports = {
     get: {
       tags: ["Enrollment"],
       security: [{ bearerAuth: [] }],
-      parameters: [{ $ref: "#/components/parameters/CourseIdParam" }],
+      parameters: [
+        { $ref: "#/components/parameters/CourseIdParam" },
+        { $ref: "#/components/parameters/CouponCode" },
+      ],
       responses: {
         200: {
           description: "Checkout session created successfully",
