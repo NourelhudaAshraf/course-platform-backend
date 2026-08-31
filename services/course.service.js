@@ -32,6 +32,24 @@ const deleteCourseService = async (courseData, id) => {
   return true;
 };
 
+const getCourseByIdPublishService = async (courseId) => {
+  const course = await Course.findOne({
+    _id: courseId,
+    status: "published",
+  }).populate({
+    path: "user",
+    select: "name",
+  });
+
+  if (!course) {
+    const error = new Error("Course not found");
+    error.status = 404;
+    throw error;
+  }
+  return course;
+};
+
 module.exports = {
   deleteCourseService,
+  getCourseByIdPublishService,
 };

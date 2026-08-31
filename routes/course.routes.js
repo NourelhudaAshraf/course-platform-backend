@@ -7,6 +7,8 @@ const {
   getCourseById,
   updateCourseById,
   deleteCourse,
+  getPublishedCourses,
+  getCourseByIdPublish,
 } = require("../controllers/course.controller");
 const { protect, restrictTo } = require("../middleware/auth.middleware");
 const lessonRouter = require("./lesson.routes");
@@ -14,6 +16,8 @@ const {
   setUserId,
   authorizedToEditCourse,
   uploadImage,
+  publishCourse,
+  unPublishCourse,
 } = require("../middleware/course.middleware");
 const {
   createCourseSchema,
@@ -28,12 +32,30 @@ const validate = require("../utils/validate-schema");
 const { validateParams, validateQuery } = validate;
 const router = express.Router();
 
+router.get("/publish", getPublishedCourses);
+router
+  .route("/publish/:id")
+  .get(getCourseByIdPublish)
+  .patch(protect, restrictTo("admin"), publishCourse, updateCourseById);
+router.patch(
+  "/un-publish/:id",
+  protect,
+  restrictTo("admin"),
+  unPublishCourse,
+  updateCourseById,
+);
+
+router.use(
+  "/:courseId/lessons",
+  validateParams(courseIdParamSchema),
+  lessonRouter,
+);
+
+router.use(protect, restrictTo("admin"));
 router
   .route("/")
   .get(validateQuery(listCoursesQuerySchema), getAllCourses)
   .post(
-    protect,
-    restrictTo("admin"),
     uploadLimiter,
     imageUpload.single("image"),
     validate(createCourseSchema),
@@ -47,8 +69,6 @@ router
   .get(validateParams(idParamSchema), getCourseById)
   .patch(
     validateParams(idParamSchema),
-    protect,
-    restrictTo("admin"),
     authorizedToEditCourse,
     uploadLimiter,
     imageUpload.single("image"),
@@ -56,18 +76,6 @@ router
     uploadImage,
     updateCourseById,
   )
-  .delete(
-    validateParams(idParamSchema),
-    protect,
-    restrictTo("admin"),
-    authorizedToEditCourse,
-    deleteCourse,
-  );
-
-router.use(
-  "/:courseId/lessons",
-  validateParams(courseIdParamSchema),
-  lessonRouter,
-);
+  .delete(validateParams(idParamSchema), authorizedToEditCourse, deleteCourse);
 
 module.exports = router;

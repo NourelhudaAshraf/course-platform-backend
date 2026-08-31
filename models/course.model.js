@@ -21,6 +21,11 @@ const courseSchema = new mongoose.Schema({
     ref: "User",
     required: [true, "Course must belong to an admin!"],
   },
+  status: {
+    type: String,
+    enum: ["draft", "published"],
+    default: "draft",
+  },
   createdAt: {
     type: Date,
     default: Date.now,

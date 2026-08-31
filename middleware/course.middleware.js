@@ -34,8 +34,22 @@ const uploadImage = catchAsync(async (req, res, next) => {
   next();
 });
 
+const publishCourse = catchAsync(async (req, res, next) => {
+  if (!req.body) req.body = {};
+  req.body.status = "published";
+  next();
+});
+
+const unPublishCourse = catchAsync(async (req, res, next) => {
+  if (!req.body) req.body = {};
+  req.body.status = "draft";
+  next();
+});
+
 module.exports = {
   setUserId,
   authorizedToEditCourse,
   uploadImage,
+  publishCourse,
+  unPublishCourse,
 };

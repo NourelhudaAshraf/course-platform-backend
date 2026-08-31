@@ -60,6 +60,7 @@ module.exports = {
       tags: ["Coupons"],
       security: [{ bearerAuth: [] }],
       parameters: [
+        { $ref: "#/components/parameters/CouponStatusQuery" },
         { $ref: "#/components/parameters/PageQuery" },
         { $ref: "#/components/parameters/LimitQuery" },
         { $ref: "#/components/parameters/SortQuery" },

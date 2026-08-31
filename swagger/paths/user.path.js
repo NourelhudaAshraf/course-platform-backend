@@ -116,6 +116,7 @@ module.exports = {
       security: [{ bearerAuth: [] }],
       parameters: [
         { $ref: "#/components/parameters/SearchUserQuery" },
+        { $ref: "#/components/parameters/RoleUserQuery" },
         { $ref: "#/components/parameters/PageQuery" },
         { $ref: "#/components/parameters/LimitQuery" },
         { $ref: "#/components/parameters/SortQuery" },

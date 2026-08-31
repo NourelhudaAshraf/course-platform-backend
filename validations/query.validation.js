@@ -53,6 +53,28 @@ const listUsersQuerySchema = joi.object({
   page,
   limit,
   sort: createSortValidator(["name", "email", "role", "createdAt"]),
+  searchUser: joi.string().trim().max(100).messages({
+    "string.max": "Search must be less than 100 characters",
+  }),
+  role: joi.string().valid("admin", "user").messages({
+    "any.only": "Role must be admin or user",
+  }),
+});
+
+const listCouponsQuerySchema = joi.object({
+  page,
+  limit,
+  sort: createSortValidator([
+    "code",
+    "percentage",
+    "createdAt",
+    "expiryDate",
+    "isActive",
+  ]),
+  code: joi.string().trim().max(100).messages({
+    "string.max": "Coupon code search must be less than 100 characters",
+  }),
+  isActive: joi.boolean(),
 });
 
 const listEnrollmentsQuerySchema = joi.object({
@@ -71,5 +93,6 @@ module.exports = {
   listCoursesQuerySchema,
   listLessonsQuerySchema,
   listUsersQuerySchema,
+  listCouponsQuerySchema,
   listEnrollmentsQuerySchema,
 };

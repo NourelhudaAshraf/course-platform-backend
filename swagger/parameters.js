@@ -64,4 +64,22 @@ module.exports = {
     description: "Coupon Code",
     schema: { type: "string", maxLength: 100 },
   },
+  RoleUserQuery: {
+    name: "role",
+    in: "query",
+    description: "Filter users by role (ex. admin)",
+    schema: { type: "string", maxLength: 100 },
+  },
+  CourseStatusQuery: {
+    name: "status",
+    in: "query",
+    description: "Filter courses by status (ex. draft)",
+    schema: { type: "string", maxLength: 100 },
+  },
+  CouponStatusQuery: {
+    name: "isActive",
+    in: "query",
+    description: "Get coupons activated or not (ex. true)",
+    schema: { type: "boolean" },
+  },
 };

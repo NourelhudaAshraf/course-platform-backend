@@ -14,6 +14,8 @@ const {
   updateCouponSchema,
   validateCouponSchema,
 } = require("../validations/coupon.validation");
+const { listCouponsQuerySchema } = require("../validations/query.validation");
+const { validateQuery } = validate;
 
 const router = express.Router();
 
@@ -28,7 +30,7 @@ router.post(
 router.use(protect, restrictTo("admin"));
 router
   .route("/")
-  .get(getAllCoupons)
+  .get(validateQuery(listCouponsQuerySchema), getAllCoupons)
   .post(validate(createCouponSchema), createCoupon);
 router
   .route("/:id")

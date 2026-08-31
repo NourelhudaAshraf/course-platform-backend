@@ -50,7 +50,7 @@ const getOne = (Model, popOptions) =>
     });
   });
 
-const getAllDocs = (Model, getUser, popOptions) =>
+const getAllDocs = (Model, getUser, popOptions, initialFilter = {}) =>
   catchAsync(async (req, res, next) => {
     // courses/:id/lessons
     const queryObj = { ...req.query };
@@ -61,9 +61,9 @@ const getAllDocs = (Model, getUser, popOptions) =>
     excludedFields.forEach((el) => delete queryObj[el]);
 
     const filter = req.params.courseId ? { course: req.params.courseId } : {};
-    const initialFilter = getUser ? { user: req.user._id } : {};
+    const addUserFilter = getUser ? { user: req.user._id } : {};
 
-    const mongoFilter = { ...filter, ...initialFilter };
+    const mongoFilter = { ...filter, ...addUserFilter, ...initialFilter };
 
     // Price filtering
     if (queryObj.minPrice || queryObj.maxPrice) {
@@ -91,6 +91,16 @@ const getAllDocs = (Model, getUser, popOptions) =>
         $regex: escapeRegex(queryObj.code),
         $options: "i",
       };
+    }
+    if (queryObj.status) {
+      mongoFilter.status = queryObj.status;
+    }
+    if (queryObj.role) {
+      mongoFilter.role = queryObj.role;
+    }
+    if (queryObj.isActive !== undefined) {
+      mongoFilter.isActive =
+        queryObj.isActive === true || queryObj.isActive === "true";
     }
     // console.log(mongoFilter);
     let query = Model.find(mongoFilter);
