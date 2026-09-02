@@ -15,6 +15,7 @@ const lessonPath = require("../swagger/paths/lesson.path");
 const statisticsPath = require("../swagger/paths/statistics.path");
 const userPath = require("../swagger/paths/user.path");
 const couponPath = require("../swagger/paths/coupon.path");
+const certificatePath = require("../swagger/paths/certificate.path");
 
 const definition = {
   openapi: "3.0.0",
@@ -59,6 +60,7 @@ const definition = {
     ...statisticsPath,
     ...userPath,
     ...couponPath,
+    ...certificatePath,
   },
 };
 

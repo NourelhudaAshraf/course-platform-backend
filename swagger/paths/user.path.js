@@ -86,14 +86,22 @@ module.exports = {
                 properties: {
                   status: { type: "string", example: "success" },
                   data: {
-                    type: "array",
-                    items: {
-                      type: "object",
-                      properties: {
-                        _id: { type: "string" },
-                        lesson: { type: "string" },
-                        completed: { type: "boolean" },
-                        lastPosition: { type: "number" },
+                    type: "object",
+                    properties: {
+                      userLessons: {
+                        type: "array",
+                        items: {
+                          type: "object",
+                          properties: {
+                            _id: { type: "string" },
+                            lesson: { type: "string" },
+                            completed: { type: "boolean" },
+                            lastPosition: { type: "number" },
+                          },
+                        },
+                      },
+                      certificateReady: {
+                        type: "boolean",
                       },
                     },
                   },
