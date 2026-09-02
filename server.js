@@ -12,6 +12,7 @@ const userRouter = require("./routes/user.routes");
 const enrollmentRouter = require("./routes/enrollment.routes");
 const statisticsRouter = require("./routes/statistics.routes");
 const couponRouter = require("./routes/coupon.routes");
+const certificateRouter = require("./routes/certificate.route");
 const { webhookHandler } = require("./controllers/enrollment.controller");
 const cors = require("cors");
 const connectDB = require("./utils/connect-db");
@@ -61,6 +62,7 @@ app.use("/api/v1/courses", courseRouter);
 app.use("/api/v1/enrollment", enrollmentRouter);
 app.use("/api/v1/statistics", statisticsRouter);
 app.use("/api/v1/coupons", couponRouter);
+app.use("/api/v1/certificates", certificateRouter);
 
 // to match any route that is not defined
 app.use((req, res, next) => next({ status: 404, message: "Route not found" }));

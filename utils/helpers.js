@@ -1,5 +1,34 @@
 const cloudinary = require("../config/cloudinary");
 const streamifier = require("streamifier");
+const puppeteer = require("puppeteer");
+const crypto = require("crypto");
+
+const generateCertificateNumber = () => {
+  const random = crypto.randomBytes(4).toString("hex").toUpperCase();
+
+  return `CERT-${Date.now()}-${random}`;
+};
+
+const generateCertificatePdf = async (data) => {
+  const browser = await puppeteer.launch({
+    headless: true, //This tells Puppeteer to run Chrome without displaying a browser window.
+  });
+
+  const page = await browser.newPage();
+
+  await page.setContent(data.html);
+
+  // convert page to pdf
+  const pdf = await page.pdf({
+    format: "A4",
+    landscape: true,
+    printBackground: true, //include colors
+  });
+
+  await browser.close();
+
+  return pdf;
+};
 
 const buildHtmlEmail = (resetUrl) => {
   return `
@@ -10,19 +39,29 @@ const buildHtmlEmail = (resetUrl) => {
   `;
 };
 
-const uploadFileToCloudinary = async (file, folder) => {
+const uploadFileToCloudinary = async (
+  file,
+  folder,
+  publicId,
+  resourceType,
+  format,
+) => {
   const result = await new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
       {
-        resource_type: file.mimetype.includes("video") ? "video" : "image",
+        resource_type:
+          resourceType ?? (file.mimetype.includes("video") ? "video" : "image"),
         folder: folder,
+        ...(publicId && { public_id: publicId }),
+        ...(format && { format }),
       },
       (error, result) => {
         if (error) reject(error);
         else resolve(result);
       },
     );
-    streamifier.createReadStream(file.buffer).pipe(stream);
+
+    streamifier.createReadStream(file).pipe(stream);
   });
   return { secure_url: result.secure_url, duration: result.duration };
 };
@@ -43,4 +82,6 @@ module.exports = {
   buildHtmlEmail,
   uploadFileToCloudinary,
   checkIfValidCoupon,
+  generateCertificatePdf,
+  generateCertificateNumber,
 };

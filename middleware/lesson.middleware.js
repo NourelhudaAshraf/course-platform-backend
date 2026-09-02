@@ -18,7 +18,7 @@ const uploadVideo = catchAsync(async (req, res, next) => {
     if (lesson?.videoUrl) await destroyFromUrl(lesson.videoUrl);
   }
   const { secure_url, duration } = await uploadFileToCloudinary(
-    req.file,
+    req.file.buffer,
     "lessons",
   );
 

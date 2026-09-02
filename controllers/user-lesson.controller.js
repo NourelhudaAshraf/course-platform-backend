@@ -12,10 +12,16 @@ const watchLesson = catchAsync(async (req, res, next) => {
 
 const getCompletedLessons = catchAsync(async (req, res) => {
   const { courseId } = req.params;
-  const userLessons = await getCompletedLessonsService(req.user, courseId);
+  const { userLessons, certificateReady } = await getCompletedLessonsService(
+    req.user,
+    courseId,
+  );
   res.status(200).json({
     status: "success",
-    data: userLessons,
+    data: {
+      userLessons,
+      certificateReady,
+    },
   });
 });
 

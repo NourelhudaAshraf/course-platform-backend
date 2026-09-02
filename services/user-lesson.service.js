@@ -1,5 +1,6 @@
 const UserLesson = require("../models/user-lesson.model");
 const Lesson = require("../models/lesson.model");
+const { createCertificateService } = require("./certificate.service");
 
 const isCompleted = (position, totalSeconds) =>
   totalSeconds > 0 && position >= totalSeconds;
@@ -11,7 +12,7 @@ const watchLessonService = async (user, lessonId, lastPosition) => {
     error.status = 404;
     throw error;
   }
-  const userLesson = await UserLesson.findOne({
+  let userLesson = await UserLesson.findOne({
     user: user._id,
     lesson: lessonId,
   });
@@ -21,18 +22,31 @@ const watchLessonService = async (user, lessonId, lastPosition) => {
     const newLastPosition = Math.max(userLesson.lastPosition, lastPosition);
     userLesson.lastPosition = newLastPosition;
     userLesson.completed = isCompleted(newLastPosition, lesson.totalSeconds);
-    await userLesson.save();
-    return userLesson;
+    userLesson = await userLesson.save();
   } else {
     //add to database
-    const newUserLesson = await UserLesson.create({
-      user: user._id,
-      lesson: lessonId,
-      lastPosition: lastPosition,
-      completed: isCompleted(lastPosition, lesson.totalSeconds),
-    });
-    return newUserLesson;
+    userLesson = await UserLesson.create(
+      {
+        user: user._id,
+        lesson: lessonId,
+        lastPosition: lastPosition,
+        completed: isCompleted(lastPosition, lesson.totalSeconds),
+      },
+      { new: true },
+    );
   }
+
+  if (userLesson.completed) {
+    const { certificateReady } = await getCompletedLessonsService(
+      user,
+      lesson.course,
+    );
+    if (certificateReady) {
+      console.log("Creating certificate");
+      await createCertificateService({ user, courseId: lesson.course });
+    }
+  }
+  return userLesson;
 };
 
 const getCompletedLessonsService = async (user, courseId) => {
@@ -42,7 +56,19 @@ const getCompletedLessonsService = async (user, courseId) => {
     user: user._id,
     lesson: { $in: lessonIds },
   }).select("lesson completed lastPosition");
-  return userLessons;
+  const completedLessons = userLessons.filter(
+    (userLesson) => userLesson.completed,
+  ).length;
+
+  const totalLessons = lessons.length;
+
+  const certificateReady =
+    totalLessons > 0 && completedLessons === totalLessons;
+
+  return {
+    userLessons,
+    certificateReady,
+  };
 };
 
 module.exports = {

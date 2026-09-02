@@ -28,7 +28,10 @@ const authorizedToEditCourse = catchAsync(async (req, res, next) => {
 
 const uploadImage = catchAsync(async (req, res, next) => {
   if (!req.file) return next();
-  const { secure_url } = await uploadFileToCloudinary(req.file, "courses");
+  const { secure_url } = await uploadFileToCloudinary(
+    req.file.buffer,
+    "courses",
+  );
   req.body.image = secure_url;
   if (req.course?.image) await destroyFromUrl(req.course.image);
   next();
