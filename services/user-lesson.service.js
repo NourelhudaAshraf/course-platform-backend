@@ -25,15 +25,14 @@ const watchLessonService = async (user, lessonId, lastPosition) => {
     userLesson = await userLesson.save();
   } else {
     //add to database
-    userLesson = await UserLesson.create(
-      {
-        user: user._id,
-        lesson: lessonId,
-        lastPosition: lastPosition,
-        completed: isCompleted(lastPosition, lesson.totalSeconds),
-      },
-      { new: true },
-    );
+    const data = {
+      user: user._id,
+      lesson: lessonId,
+      lastPosition,
+      completed: isCompleted(lastPosition, lesson.totalSeconds),
+    };
+    userLesson = new UserLesson(data);
+    await userLesson.save();
   }
 
   if (userLesson.completed) {
@@ -42,7 +41,7 @@ const watchLessonService = async (user, lessonId, lastPosition) => {
       lesson.course,
     );
     if (certificateReady) {
-      console.log("Creating certificate");
+      // console.log("Creating certificate");
       await createCertificateService({ user, courseId: lesson.course });
     }
   }
