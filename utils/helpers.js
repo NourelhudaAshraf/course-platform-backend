@@ -1,6 +1,5 @@
 const cloudinary = require("../config/cloudinary");
 const streamifier = require("streamifier");
-const puppeteer = require("puppeteer");
 const crypto = require("crypto");
 
 const generateCertificateNumber = () => {
@@ -10,7 +9,9 @@ const generateCertificateNumber = () => {
 };
 
 const generateCertificatePdf = async (data) => {
-  const browser = await puppeteer.launch({
+  const puppeteer = await import("puppeteer");
+
+  const browser = await puppeteer.default.launch({
     headless: true, //This tells Puppeteer to run Chrome without displaying a browser window.
   });
 
@@ -22,7 +23,7 @@ const generateCertificatePdf = async (data) => {
   const pdf = await page.pdf({
     format: "A4",
     landscape: true,
-    printBackground: true, //include colors
+    printBackground: true,
   });
 
   await browser.close();
